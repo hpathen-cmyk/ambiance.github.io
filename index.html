@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sooraj Dino Game</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
     /* Animated gradient background */
@@ -80,6 +81,13 @@
       display: block;
       margin: 0 auto;
     }
+
+    #infoImage img {
+      max-width: 80%;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+
   </style>
 </head>
 
@@ -90,7 +98,12 @@
     <div class="intro" id="infoBox">
       <h1>Welcome 👋</h1>
       <p>You are now visiting <strong>Sooraj’s Official Website</strong></p>
-      <button onclick="breakInfo()">Site Info</button>
+      <button onclick="showSiteInfo()">Site Info</button>
+    </div>
+
+    <!-- Image that appears when Site Info is clicked -->
+    <div id="infoImage" style="display:none; text-align:center;">
+      <img src="https://i.imgur.com/3JPpV1t.png" alt="Site Info">
     </div>
 
     <!-- Dino Game -->
@@ -98,12 +111,18 @@
   </div>
 
   <script>
-    // --- Intro button animation ---
-    function breakInfo() {
-      const box = document.getElementById("infoBox");
-      box.classList.add("shake");
-      setTimeout(() => { box.classList.add("break"); }, 400);
+    // --- Show Site Info Image ---
+    function showSiteInfo() {
+      document.getElementById("infoBox").style.display = "none";
+      document.getElementById("infoImage").style.display = "block";
     }
+
+    // --- Load Images for Dino Game ---
+    const dinoImg = new Image();
+    dinoImg.src = 'https://i.imgur.com/8b8Qv5Y.png'; // Replace with your Dino image
+
+    const cactusImg = new Image();
+    cactusImg.src = 'https://i.imgur.com/h0Z3u5G.png'; // Replace with your Cactus image
 
     // --- Dino Game ---
     const canvas = document.getElementById('game');
@@ -120,25 +139,25 @@
     }
 
     function draw() {
-      ctx.clearRect(0,0,600,150);
-      ctx.fillStyle = "green"; // Dino
-      ctx.fillRect(50, dinoY, 20, 20);
-      ctx.fillStyle = "brown"; // Cactus
-      ctx.fillRect(cactusX, 130, 15, 20);
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      // Draw Dino
+      ctx.drawImage(dinoImg, 50, dinoY, 30, 30);
+      // Draw Cactus
+      ctx.drawImage(cactusImg, cactusX, 130, 15, 20);
     }
 
     function update() {
       if (isJumping) {
-        dinoVY -= gravity;
+        dinoVY += gravity;
         dinoY += dinoVY;
         if (dinoY >= 120) { dinoY = 120; dinoVY=0; isJumping=false; }
       }
 
       cactusX -= 5;
-      if (cactusX < -20) cactusX = 600;
+      if (cactusX < -20) cactusX = canvas.width;
 
       // Collision → Malayalam voice
-      if(cactusX < 70 && cactusX > 50 && dinoY + 20 > 130) {
+      if(cactusX < 80 && cactusX > 50 && dinoY + 30 > 130) {
         reset();
         const msg = new SpeechSynthesisUtterance();
         msg.text = "ഓവർ, കളി അവസാനിച്ചു"; // Malayalam Game Over
@@ -164,7 +183,6 @@
       msg.lang = "ml-IN";
       window.speechSynthesis.speak(msg);
     }
-
   </script>
 </body>
 </html>
