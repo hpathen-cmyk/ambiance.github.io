@@ -1,56 +1,45 @@
-
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Sooraj Website</title>
+  <title>Sooraj Dino Game</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
     body {
       margin: 0;
-      background: #eaeaea;
       font-family: Arial, Helvetica, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #ff5fa2, #4facfe);
     }
 
     .border-box {
       margin: 0.1cm;
-      border: 2px solid #000;
-      min-height: calc(100vh - 0.2cm);
-      box-sizing: border-box;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      border: 2px solid black;
       padding: 20px;
+      text-align: center;
       background: linear-gradient(135deg, #ff5fa2, #4facfe);
+      border-radius: 10px;
     }
 
     .intro {
       background: rgba(255, 255, 255, 0.18);
       backdrop-filter: blur(6px);
-      padding: 30px 25px;
+      padding: 20px;
       border-radius: 14px;
       color: white;
-      max-width: 420px;
-      width: 100%;
-      text-align: center;
-      transition: transform 0.4s ease;
-    }
-
-    .intro h1 {
-      margin: 0 0 10px;
-      font-size: 30px;
-    }
-
-    .intro p {
-      font-size: 16px;
+      max-width: 400px;
       margin-bottom: 20px;
+      transition: transform 0.4s ease;
     }
 
     button {
       background: #ffffff;
       color: #333;
       border: none;
-      padding: 12px 22px;
+      padding: 10px 20px;
       font-size: 15px;
       border-radius: 25px;
       cursor: pointer;
@@ -61,7 +50,6 @@
       transform: scale(1.05);
     }
 
-    /* SHAKE animation */
     .shake {
       animation: shake 0.4s;
     }
@@ -74,42 +62,122 @@
       100% { transform: translateX(0); }
     }
 
-    /* BREAK animation */
     .break {
       animation: break 0.8s forwards;
     }
 
     @keyframes break {
-      0% {
-        opacity: 1;
-        transform: scale(1) rotate(0deg);
-      }
-      100% {
-        opacity: 0;
-        transform: scale(0.3) rotate(25deg);
-      }
+      0% { opacity: 1; transform: scale(1) rotate(0deg); }
+      100% { opacity: 0; transform: scale(0.3) rotate(25deg); }
     }
+
+    canvas {
+      border: 2px solid black;
+      background: white;
+      display: block;
+      margin: 0 auto;
+    }
+
   </style>
 </head>
 
 <body>
   <div class="border-box">
+
+    <!-- Intro + Site Info Button -->
     <div class="intro" id="infoBox">
       <h1>Welcome 👋</h1>
       <p>You are now visiting <strong>Sooraj’s Official Website</strong></p>
       <button onclick="breakInfo()">Site Info</button>
     </div>
+
+    <!-- Dino Game -->
+    <canvas id="game" width="600" height="150"></canvas>
   </div>
 
   <script>
+    // --- Intro button animation ---
     function breakInfo() {
       const box = document.getElementById("infoBox");
       box.classList.add("shake");
-
       setTimeout(() => {
         box.classList.add("break");
       }, 400);
     }
+
+    // --- Dino Game ---
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
+
+    let dinoY = 120, dinoVY = 0, gravity = 0.6;
+    let isJumping = false;
+    let cactusX = 600;
+
+    function reset() {
+      dinoY = 120; 
+      dinoVY = 0;
+      cactusX = 600;
+    }
+
+    function draw() {
+      ctx.clearRect(0,0,600,150);
+      // Dino
+      ctx.fillStyle = "green";
+      ctx.fillRect(50, dinoY, 20, 20);
+      // Cactus
+      ctx.fillStyle = "brown";
+      ctx.fillRect(cactusX, 130, 15, 20);
+    }
+
+    function update() {
+      if (isJumping) {
+        dinoVY -= gravity;
+        dinoY += dinoVY;
+        if (dinoY >= 120) { dinoY = 120; dinoVY=0; isJumping=false; }
+      }
+
+      cactusX -= 5;
+      if (cactusX < -20) cactusX = 600;
+
+      // Collision
+      if(cactusX < 70 && cactusX > 50 && dinoY + 20 > 130) {
+        reset();
+        playVoice();
+      }
+    }
+
+    function loop() {
+      update();
+      draw();
+      requestAnimationFrame(loop);
+    }
+
+    document.addEventListener('keydown', e => {
+      if(e.code === "Space" && !isJumping) {
+        dinoVY = -12;
+        isJumping = true;
+      }
+    });
+
+    // --- Custom Game Over Voice ---
+    function playVoice() {
+      const msg = new SpeechSynthesisUtterance();
+      msg.text = "어, 착착착착착착착착.";
+      msg.lang = "ko-KR";
+      window.speechSynthesis.speak(msg);
+    }
+
+    // Start game loop
+    loop();
+
+    // Start voice once at page load (optional)
+    window.onload = () => {
+      const msg = new SpeechSynthesisUtterance();
+      msg.text = "Op Kerala Gamer";
+      msg.lang = "en-US";
+      window.speechSynthesis.speak(msg);
+    }
+
   </script>
 </body>
-</html>
+</htm
