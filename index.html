@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
+    /* Animated gradient background */
     body {
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
@@ -12,7 +13,15 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      background: linear-gradient(135deg, #ff5fa2, #4facfe);
+      background: linear-gradient(45deg, orange, red, green, yellow);
+      background-size: 400% 400%;
+      animation: gradientLoop 20s ease infinite;
+    }
+
+    @keyframes gradientLoop {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
     .border-box {
@@ -20,7 +29,7 @@
       border: 2px solid black;
       padding: 20px;
       text-align: center;
-      background: linear-gradient(135deg, #ff5fa2, #4facfe);
+      background: rgba(255,255,255,0.1);
       border-radius: 10px;
     }
 
@@ -46,13 +55,9 @@
       transition: transform 0.2s ease;
     }
 
-    button:hover {
-      transform: scale(1.05);
-    }
+    button:hover { transform: scale(1.05); }
 
-    .shake {
-      animation: shake 0.4s;
-    }
+    .shake { animation: shake 0.4s; }
 
     @keyframes shake {
       0% { transform: translateX(0); }
@@ -62,9 +67,7 @@
       100% { transform: translateX(0); }
     }
 
-    .break {
-      animation: break 0.8s forwards;
-    }
+    .break { animation: break 0.8s forwards; }
 
     @keyframes break {
       0% { opacity: 1; transform: scale(1) rotate(0deg); }
@@ -77,7 +80,6 @@
       display: block;
       margin: 0 auto;
     }
-
   </style>
 </head>
 
@@ -100,9 +102,7 @@
     function breakInfo() {
       const box = document.getElementById("infoBox");
       box.classList.add("shake");
-      setTimeout(() => {
-        box.classList.add("break");
-      }, 400);
+      setTimeout(() => { box.classList.add("break"); }, 400);
     }
 
     // --- Dino Game ---
@@ -121,11 +121,9 @@
 
     function draw() {
       ctx.clearRect(0,0,600,150);
-      // Dino
-      ctx.fillStyle = "green";
+      ctx.fillStyle = "green"; // Dino
       ctx.fillRect(50, dinoY, 20, 20);
-      // Cactus
-      ctx.fillStyle = "brown";
+      ctx.fillStyle = "brown"; // Cactus
       ctx.fillRect(cactusX, 130, 15, 20);
     }
 
@@ -139,17 +137,14 @@
       cactusX -= 5;
       if (cactusX < -20) cactusX = 600;
 
-      // Collision
+      // Collision → Malayalam voice
       if(cactusX < 70 && cactusX > 50 && dinoY + 20 > 130) {
         reset();
-        playVoice();
+        const msg = new SpeechSynthesisUtterance();
+        msg.text = "ഓവർ, കളി അവസാനിച്ചു"; // Malayalam Game Over
+        msg.lang = "ml-IN";
+        window.speechSynthesis.speak(msg);
       }
-    }
-
-    function loop() {
-      update();
-      draw();
-      requestAnimationFrame(loop);
     }
 
     document.addEventListener('keydown', e => {
@@ -159,25 +154,17 @@
       }
     });
 
-    // --- Custom Game Over Voice ---
-    function playVoice() {
-      const msg = new SpeechSynthesisUtterance();
-      msg.text = "어, 착착착착착착착착.";
-      msg.lang = "ko-KR";
-      window.speechSynthesis.speak(msg);
-    }
-
-    // Start game loop
+    function loop() { update(); draw(); requestAnimationFrame(loop); }
     loop();
 
-    // Start voice once at page load (optional)
+    // Intro voice in Malayalam
     window.onload = () => {
       const msg = new SpeechSynthesisUtterance();
-      msg.text = "Op Kerala Gamer";
-      msg.lang = "en-US";
+      msg.text = "ഓപ് കേരള ഗെയിമർ"; // Malayalam intro
+      msg.lang = "ml-IN";
       window.speechSynthesis.speak(msg);
     }
 
   </script>
 </body>
-</htm
+</html>
