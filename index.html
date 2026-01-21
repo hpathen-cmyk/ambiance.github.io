@@ -17,13 +17,21 @@ canvas {
 }
 #tap {
   position: absolute;
-  top: 50%;
+  top: 45%;
   width: 100%;
   text-align: center;
-  font-size: 30px;
-  font-weight: bold;
+  font-size: 28px;
   color: white;
   text-shadow: 2px 2px black;
+}
+#counter {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: white;
+  padding: 6px 12px;
+  font-weight: bold;
+  border-radius: 6px;
 }
 #payBox {
   display: none;
@@ -48,12 +56,13 @@ canvas {
 <body>
 
 <div id="tap">TAP TO START</div>
+<div id="counter">Plays left: 2</div>
 
 <div id="payBox">
-  <h2>Free Plays Finished</h2>
+  <h2>No Free Plays Left</h2>
   <p>Pay ₹10 via GPay to continue</p>
 
-  <a href="upi://pay?pa=9567857306@upi&pn=Sooraj&am=10&cu=INR" target="_blank">
+  <a href="upi://pay?pa=9567857306@upi&pn=Sooraj&am=10&cu=INR">
     <button>PAY WITH GPAY</button>
   </a>
 
@@ -67,12 +76,14 @@ canvas {
 const c = document.getElementById("c");
 const ctx = c.getContext("2d");
 
-/* ===== PAYMENT STATE ===== */
-let plays = Number(localStorage.getItem("plays") || 0);
-let paid  = localStorage.getItem("paid") === "yes";
+/* ===== PLAY LIMIT ===== */
+const MAX_PLAYS = 2;
+let playsUsed = Number(localStorage.getItem("playsUsed") || 0);
+let paid = localStorage.getItem("paid") === "yes";
 
 /* ===== GAME STATE ===== */
 let started = false;
+let gameLocked = false;
 
 const bird = { x:80, y:300, r:12, v:0 };
 const gravity = 0.5;
@@ -82,30 +93,39 @@ const pipeW = 50;
 const gap = 150;
 let pipes = [];
 
-/* ===== GAME OVER (ONLY PLACE PLAYS INCREASE) ===== */
+updateCounter();
+
+/* ===== FUNCTIONS ===== */
+function updateCounter() {
+  const left = Math.max(0, MAX_PLAYS - playsUsed);
+  document.getElementById("counter").innerText = "Plays left: " + left;
+}
+
+function showPayment() {
+  gameLocked = true;
+  document.getElementById("payBox").style.display = "block";
+}
+
 function gameOver() {
-  plays++;
-  localStorage.setItem("plays", plays);
+  if (!started || gameLocked) return; // HARD LOCK
 
   started = false;
   pipes = [];
   bird.y = 300;
   bird.v = 0;
 
-  if (plays >= 2 && !paid) {
-    document.getElementById("payBox").style.display = "block";
+  playsUsed++;
+  localStorage.setItem("playsUsed", playsUsed);
+  updateCounter();
+
+  if (playsUsed >= MAX_PLAYS && !paid) {
+    showPayment();
     return;
   }
 
   document.getElementById("tap").style.display = "block";
-
-  const msg = new SpeechSynthesisUtterance("കളി അവസാനിച്ചു");
-  msg.lang = "ml-IN";
-  speechSynthesis.cancel();
-  speechSynthesis.speak(msg);
 }
 
-/* ===== PIPE ===== */
 function addPipe() {
   pipes.push({
     x: c.width,
@@ -113,9 +133,8 @@ function addPipe() {
   });
 }
 
-/* ===== UPDATE ===== */
 function update() {
-  if (!started) return;
+  if (!started || gameLocked) return;
 
   bird.v += gravity;
   bird.y += bird.v;
@@ -142,7 +161,6 @@ function update() {
   pipes = pipes.filter(p => p.x > -pipeW);
 }
 
-/* ===== DRAW ===== */
 function draw() {
   ctx.clearRect(0,0,c.width,c.height);
 
@@ -158,7 +176,6 @@ function draw() {
   }
 }
 
-/* ===== LOOP ===== */
 function loop() {
   update();
   draw();
@@ -166,10 +183,9 @@ function loop() {
 }
 loop();
 
-/* ===== CONTROLS ===== */
 function start() {
-  if (plays >= 2 && !paid) {
-    document.getElementById("payBox").style.display = "block";
+  if (gameLocked) {
+    showPayment();
     return;
   }
   if (!started) {
@@ -181,13 +197,18 @@ function start() {
 
 function unlockGame() {
   paid = true;
-  plays = 0;
+  gameLocked = false;
+  playsUsed = 0;
+
   localStorage.setItem("paid", "yes");
-  localStorage.setItem("plays", "0");
+  localStorage.setItem("playsUsed", "0");
+
   document.getElementById("payBox").style.display = "none";
+  updateCounter();
   document.getElementById("tap").style.display = "block";
 }
 
+/* ===== CONTROLS ===== */
 document.addEventListener("keydown", e => e.code === "Space" && start());
 c.addEventListener("mousedown", start);
 c.addEventListener("touchstart", start);
