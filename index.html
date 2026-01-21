@@ -8,28 +8,15 @@
 <style>
   body {
     margin: 0;
-    overflow: hidden;
     background: #6ec6d1;
+    overflow: hidden;
     font-family: Arial, Helvetica, sans-serif;
   }
 
   canvas {
     display: block;
-    margin: 0 auto;
+    margin: auto;
     background: #6ec6d1;
-  }
-
-  .tap {
-    position: absolute;
-    bottom: 140px;
-    left: 50%;
-    transform: translateX(-50%);
-    color: red;
-    font-weight: bold;
-    font-size: 22px;
-    background: white;
-    padding: 6px 14px;
-    border-radius: 6px;
   }
 
   .ready {
@@ -43,25 +30,38 @@
     text-shadow: 3px 3px #000;
   }
 
-  .scoreBox {
+  .tap {
     position: absolute;
-    top: 30px;
+    bottom: 160px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    color: red;
+    font-weight: bold;
+    padding: 6px 14px;
+    border-radius: 6px;
+  }
+
+  .score {
+    position: absolute;
+    top: 20px;
     left: 50%;
     transform: translateX(-50%);
     background: white;
     border: 3px solid black;
-    padding: 5px 18px;
+    padding: 4px 14px;
     font-size: 24px;
     font-weight: bold;
+    display: none;
   }
 </style>
 </head>
 
 <body>
 
-<div class="ready" id="readyText">Get Ready</div>
-<div class="tap" id="tapText">TAP</div>
-<div class="scoreBox" id="scoreBox">0</div>
+<div class="ready" id="ready">Get Ready</div>
+<div class="tap" id="tap">TAP</div>
+<div class="score" id="score">0</div>
 
 <canvas id="game" width="360" height="640"></canvas>
 
@@ -69,53 +69,43 @@
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
-let gameStarted = false;
+let started = false;
 let score = 0;
 
 const bird = {
   x: 80,
   y: 300,
-  r: 14,
+  r: 12,
   vy: 0
 };
 
-const gravity = 0.5;
+const gravity = 0.45;
 const jump = -8;
 
-// draw bird
-function drawBird() {
-  ctx.fillStyle = "yellow";
-  ctx.beginPath();
-  ctx.arc(bird.x, bird.y, bird.r, 0, Math.PI * 2);
-  ctx.fill();
+let pipes = [];
+
+function createPipe() {
+  let gap = 140;
+  let topHeight = Math.random() * 200 + 50;
+  pipes.push({
+    x: canvas.width,
+    top: topHeight,
+    bottom: canvas.height - (topHeight + gap),
+    passed: false
+  });
 }
 
-// update
-function update() {
-  if (gameStarted) {
-    bird.vy += gravity;
-    bird.y += bird.vy;
-
-    if (bird.y > canvas.height - bird.r) reset();
-    if (bird.y < bird.r) bird.y = bird.r;
-  }
-}
-
-// draw
-function draw() {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  drawBird();
-}
-
-// reset
 function reset() {
   bird.y = 300;
   bird.vy = 0;
+  pipes = [];
   score = 0;
-  gameStarted = false;
-  document.getElementById("readyText").style.display = "block";
-  document.getElementById("tapText").style.display = "block";
-  document.getElementById("scoreBox").innerText = score;
+  started = false;
+
+  document.getElementById("ready").style.display = "block";
+  document.getElementById("tap").style.display = "block";
+  document.getElementById("score").style.display = "none";
+  document.getElementById("score").innerText = score;
 
   const msg = new SpeechSynthesisUtterance("കളി അവസാനിച്ചു");
   msg.lang = "ml-IN";
@@ -123,33 +113,61 @@ function reset() {
   speechSynthesis.speak(msg);
 }
 
-// tap / click / space
 function flap() {
-  if (!gameStarted) {
-    gameStarted = true;
-    document.getElementById("readyText").style.display = "none";
-    document.getElementById("tapText").style.display = "none";
+  if (!started) {
+    started = true;
+    document.getElementById("ready").style.display = "none";
+    document.getElementById("tap").style.display = "none";
+    document.getElementById("score").style.display = "block";
   }
   bird.vy = jump;
-  score++;
-  document.getElementById("scoreBox").innerText = score;
 }
 
-document.addEventListener("keydown", e => {
-  if (e.code === "Space") flap();
-});
+function update() {
+  if (!started) return;
 
-canvas.addEventListener("mousedown", flap);
-canvas.addEventListener("touchstart", flap);
+  bird.vy += gravity;
+  bird.y += bird.vy;
 
-// loop
-function loop() {
-  update();
-  draw();
-  requestAnimationFrame(loop);
+  if (bird.y < bird.r || bird.y > canvas.height - bird.r) reset();
+
+  if (pipes.length === 0 || pipes[pipes.length - 1].x < 180) {
+    createPipe();
+  }
+
+  pipes.forEach(p => {
+    p.x -= 2.5;
+
+    if (!p.passed && p.x + 50 < bird.x) {
+      p.passed = true;
+      score++;
+      document.getElementById("score").innerText = score;
+    }
+
+    // collision
+    if (
+      bird.x + bird.r > p.x &&
+      bird.x - bird.r < p.x + 50 &&
+      (bird.y - bird.r < p.top || bird.y + bird.r > canvas.height - p.bottom)
+    ) {
+      reset();
+    }
+  });
+
+  pipes = pipes.filter(p => p.x > -60);
 }
-loop();
-</script>
 
-</body>
-</html>
+function draw() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // bird
+  ctx.fillStyle = "yellow";
+  ctx.beginPath();
+  ctx.arc(bird.x, bird.y, bird.r, 0, Math.PI * 2);
+  ctx.fill();
+
+  // pipes
+  ctx.fillStyle = "#6abf40";
+  pipes.forEach(p => {
+    ctx.fillRect(p.x, 0, 50, p.top);
+    ctx.fillRect(p.x, canvas.height -
