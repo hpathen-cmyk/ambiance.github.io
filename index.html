@@ -11,13 +11,10 @@ body {
   overflow: hidden;
   font-family: Arial, sans-serif;
 }
-
 canvas {
   display: block;
   margin: auto;
-  background: #70c5ce;
 }
-
 #tap {
   position: absolute;
   top: 50%;
@@ -28,19 +25,16 @@ canvas {
   color: white;
   text-shadow: 2px 2px black;
 }
-
 #payBox {
   display: none;
   position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
+  inset: 0;
   background: rgba(0,0,0,0.9);
   color: white;
   text-align: center;
-  padding-top: 150px;
+  padding-top: 160px;
   z-index: 999;
 }
-
 #payBox button {
   padding: 14px 26px;
   font-size: 18px;
@@ -59,14 +53,11 @@ canvas {
   <h2>Free Plays Finished</h2>
   <p>Pay ₹10 via GPay to continue</p>
 
-  <!-- GPay UPI link -->
-  <a href="upi://pay?pa=9567857306@upi&pn=Sooraj&am=10&cu=INR"
-     target="_blank">
+  <a href="upi://pay?pa=9567857306@upi&pn=Sooraj&am=10&cu=INR" target="_blank">
     <button>PAY WITH GPAY</button>
   </a>
 
   <br><br>
-
   <button onclick="unlockGame()">I HAVE PAID</button>
 </div>
 
@@ -76,22 +67,14 @@ canvas {
 const c = document.getElementById("c");
 const ctx = c.getContext("2d");
 
+/* ===== PAYMENT STATE ===== */
+let plays = Number(localStorage.getItem("plays") || 0);
+let paid  = localStorage.getItem("paid") === "yes";
+
+/* ===== GAME STATE ===== */
 let started = false;
 
-// payment tracking
-let plays = localStorage.getItem("plays")
-  ? parseInt(localStorage.getItem("plays"))
-  : 0;
-
-let paid = localStorage.getItem("paid") === "yes";
-
-const bird = {
-  x: 80,
-  y: 300,
-  r: 12,
-  v: 0
-};
-
+const bird = { x:80, y:300, r:12, v:0 };
 const gravity = 0.5;
 const jump = -8;
 
@@ -99,24 +82,21 @@ const pipeW = 50;
 const gap = 150;
 let pipes = [];
 
-function addPipe() {
-  let top = Math.random() * 250 + 50;
-  pipes.push({ x: c.width, top: top });
-}
-
-function reset() {
+/* ===== GAME OVER (ONLY PLACE PLAYS INCREASE) ===== */
+function gameOver() {
   plays++;
   localStorage.setItem("plays", plays);
+
+  started = false;
+  pipes = [];
+  bird.y = 300;
+  bird.v = 0;
 
   if (plays >= 2 && !paid) {
     document.getElementById("payBox").style.display = "block";
     return;
   }
 
-  bird.y = 300;
-  bird.v = 0;
-  pipes = [];
-  started = false;
   document.getElementById("tap").style.display = "block";
 
   const msg = new SpeechSynthesisUtterance("കളി അവസാനിച്ചു");
@@ -125,13 +105,22 @@ function reset() {
   speechSynthesis.speak(msg);
 }
 
+/* ===== PIPE ===== */
+function addPipe() {
+  pipes.push({
+    x: c.width,
+    top: Math.random() * 250 + 40
+  });
+}
+
+/* ===== UPDATE ===== */
 function update() {
   if (!started) return;
 
   bird.v += gravity;
   bird.y += bird.v;
 
-  if (bird.y < 0 || bird.y > c.height) reset();
+  if (bird.y < 0 || bird.y > c.height) gameOver();
 
   if (pipes.length === 0 || pipes[pipes.length - 1].x < 200) {
     addPipe();
@@ -140,30 +129,28 @@ function update() {
   for (let p of pipes) {
     p.x -= 2.5;
 
-    // collision
     if (
       bird.x + bird.r > p.x &&
       bird.x - bird.r < p.x + pipeW &&
       (bird.y - bird.r < p.top ||
        bird.y + bird.r > p.top + gap)
     ) {
-      reset();
+      gameOver();
     }
   }
 
   pipes = pipes.filter(p => p.x > -pipeW);
 }
 
+/* ===== DRAW ===== */
 function draw() {
   ctx.clearRect(0,0,c.width,c.height);
 
-  // bird
   ctx.fillStyle = "yellow";
   ctx.beginPath();
   ctx.arc(bird.x, bird.y, bird.r, 0, Math.PI*2);
   ctx.fill();
 
-  // pipes
   ctx.fillStyle = "green";
   for (let p of pipes) {
     ctx.fillRect(p.x, 0, pipeW, p.top);
@@ -171,6 +158,7 @@ function draw() {
   }
 }
 
+/* ===== LOOP ===== */
 function loop() {
   update();
   draw();
@@ -178,7 +166,12 @@ function loop() {
 }
 loop();
 
+/* ===== CONTROLS ===== */
 function start() {
+  if (plays >= 2 && !paid) {
+    document.getElementById("payBox").style.display = "block";
+    return;
+  }
   if (!started) {
     started = true;
     document.getElementById("tap").style.display = "none";
@@ -187,17 +180,15 @@ function start() {
 }
 
 function unlockGame() {
-  localStorage.setItem("paid", "yes");
   paid = true;
   plays = 0;
-  localStorage.setItem("plays", plays);
+  localStorage.setItem("paid", "yes");
+  localStorage.setItem("plays", "0");
   document.getElementById("payBox").style.display = "none";
-  reset();
+  document.getElementById("tap").style.display = "block";
 }
 
-document.addEventListener("keydown", e => {
-  if (e.code === "Space") start();
-});
+document.addEventListener("keydown", e => e.code === "Space" && start());
 c.addEventListener("mousedown", start);
 c.addEventListener("touchstart", start);
 </script>
