@@ -1,162 +1,140 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sooraj Game</title>
+
+<title>Ambiance Dino Game</title>
+
+<!-- ✅ Google AdSense verification -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1824710596042778"
+     crossorigin="anonymous"></script>
 
 <style>
 body{
   margin:0;
-  font-family:Arial, sans-serif;
-  background:#70c5ce;
+  font-family:Arial,Helvetica,sans-serif;
+  background: linear-gradient(270deg,#ff9800,#f44336,#4caf50,#ffeb3b);
+  background-size:600% 600%;
+  animation:bg 15s ease infinite;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
 }
-canvas{display:block;margin:auto;}
-#tap{
+@keyframes bg{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+#game{
+  width:300px;
+  height:200px;
+  border:2px solid #000;
+  background:#fff;
+  position:relative;
+  overflow:hidden;
+}
+#dino{
+  width:40px;
+  height:40px;
+  background:#000;
   position:absolute;
-  top:40%;
-  width:100%;
-  text-align:center;
-  font-size:26px;
-  color:white;
-  text-shadow:2px 2px black;
+  bottom:0;
+  left:20px;
 }
-#adTop,#adBottom{
-  background:#fff;
-  color:#000;
-  text-align:center;
-  border-radius:6px;
-  margin:10px auto;
+.jump{
+  animation:jump 0.5s linear;
 }
-#adTop{width:320px;height:50px;line-height:50px;}
-#adBottom{width:320px;height:100px;line-height:100px;}
-
-footer{
-  background:#fff;
-  padding:20px;
-  margin-top:30px;
-  font-size:14px;
+@keyframes jump{
+  0%{bottom:0}
+  50%{bottom:80px}
+  100%{bottom:0}
 }
-footer h2{margin-top:20px;}
-footer a{color:#0066cc;text-decoration:none;margin-right:10px;}
-section{margin-top:30px;}
+#cactus{
+  width:20px;
+  height:40px;
+  background:red;
+  position:absolute;
+  bottom:0;
+  right:-20px;
+  animation:move 1.5s linear infinite;
+}
+@keyframes move{
+  0%{right:-20px}
+  100%{right:320px}
+}
+#overlay{
+  display:none;
+  position:fixed;
+  top:0;left:0;
+  width:100%;height:100%;
+  background:rgba(0,0,0,0.8);
+  color:#fff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  z-index:10;
+}
+button{
+  padding:10px 20px;
+  font-size:16px;
+  margin-top:10px;
+  cursor:pointer;
+}
 </style>
 </head>
 
 <body>
 
-<div id="adTop">🔸 Top Banner Ad</div>
+<div id="game">
+  <div id="dino"></div>
+  <div id="cactus"></div>
+</div>
 
-<div id="tap">TAP TO START</div>
-<canvas id="c" width="360" height="640"></canvas>
-
-<div id="adBottom">🔸 Bottom Ad</div>
-
-<footer>
-  <div>
-    <a href="#about">About</a>
-    <a href="#privacy">Privacy Policy</a>
-    <a href="#contact">Contact</a>
-  </div>
-
-  <section id="about">
-    <h2>About</h2>
-    <p>Sooraj Game is a simple browser-based game created for fun and learning.</p>
-    <p>This project is built using HTML, CSS, and JavaScript.</p>
-  </section>
-
-  <section id="privacy">
-    <h2>Privacy Policy</h2>
-    <p>We respect your privacy and do not collect personal data directly.</p>
-    <p>Third-party services such as Google AdSense may use cookies to display ads.</p>
-    <p>Users can manage ad preferences via Google Ads Settings.</p>
-  </section>
-
-  <section id="contact">
-    <h2>Contact</h2>
-    <p>Email: <strong>tkhamsa985@gmail.com</strong></p>
-  </section>
-</footer>
+<div id="overlay">
+  <h2>Play limit reached</h2>
+  <p>Please support us to continue</p>
+  <p><b>GPay:</b> 9567857306</p>
+  <button onclick="unlock()">I have paid</button>
+</div>
 
 <script>
-const c=document.getElementById("c");
-const ctx=c.getContext("2d");
+let dino=document.getElementById("dino");
+let cactus=document.getElementById("cactus");
+let overlay=document.getElementById("overlay");
 
-let started=false;
-const bird={x:80,y:300,v:0};
-const gravity=0.5;
-const jump=-8;
-const gap=150;
-const pipeW=50;
-let pipes=[];
+let plays = localStorage.getItem("plays") || 0;
 
-function gameOver(){
-  started=false;
-  bird.y=300;
-  bird.v=0;
-  pipes=[];
-  document.getElementById("tap").style.display="block";
-}
+document.addEventListener("keydown",()=>{
+  if(!dino.classList.contains("jump")){
+    dino.classList.add("jump");
+    setTimeout(()=>dino.classList.remove("jump"),500);
+  }
+});
 
-function addPipe(){
-  pipes.push({x:c.width,top:Math.random()*250+40});
-}
+let check = setInterval(()=>{
+  let dTop=parseInt(window.getComputedStyle(dino).getPropertyValue("top"));
+  let cLeft=parseInt(window.getComputedStyle(cactus).getPropertyValue("left"));
 
-function update(){
-  if(!started) return;
+  if(cLeft<60 && cLeft>20 && dTop>120){
+    plays++;
+    localStorage.setItem("plays",plays);
+    alert("Game Over");
 
-  bird.v+=gravity;
-  bird.y+=bird.v;
-
-  if(bird.y<0||bird.y>c.height) gameOver();
-
-  if(pipes.length===0||pipes[pipes.length-1].x<200) addPipe();
-
-  for(let p of pipes){
-    p.x-=2.5;
-    if(
-      bird.x+12>p.x &&
-      bird.x-12<p.x+pipeW &&
-      (bird.y-12<p.top || bird.y+12>p.top+gap)
-    ){
-      gameOver();
+    if(plays>=2){
+      overlay.style.display="flex";
+      cactus.style.animation="none";
     }
   }
-  pipes=pipes.filter(p=>p.x>-pipeW);
+},10);
+
+function unlock(){
+  localStorage.setItem("plays",0);
+  overlay.style.display="none";
+  cactus.style.animation="move 1.5s linear infinite";
 }
-
-function draw(){
-  ctx.clearRect(0,0,c.width,c.height);
-  ctx.fillStyle="yellow";
-  ctx.beginPath();
-  ctx.arc(bird.x,bird.y,12,0,Math.PI*2);
-  ctx.fill();
-
-  ctx.fillStyle="green";
-  for(let p of pipes){
-    ctx.fillRect(p.x,0,pipeW,p.top);
-    ctx.fillRect(p.x,p.top+gap,pipeW,c.height);
-  }
-}
-
-function loop(){
-  update();
-  draw();
-  requestAnimationFrame(loop);
-}
-loop();
-
-function start(){
-  if(!started){
-    started=true;
-    document.getElementById("tap").style.display="none";
-  }
-  bird.v=jump;
-}
-
-document.addEventListener("keydown",e=>e.code==="Space"&&start());
-c.addEventListener("mousedown",start);
-c.addEventListener("touchstart",start);
 </script>
 
 </body>
