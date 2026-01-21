@@ -40,7 +40,7 @@ canvas {
   background: rgba(0,0,0,0.9);
   color: white;
   text-align: center;
-  padding-top: 160px;
+  padding-top: 150px;
   z-index: 999;
 }
 #payBox button {
@@ -49,6 +49,11 @@ canvas {
   margin: 10px;
   border-radius: 8px;
   border: none;
+}
+#waitText {
+  margin-top: 20px;
+  font-size: 16px;
+  color: #ffcc00;
 }
 </style>
 </head>
@@ -67,7 +72,10 @@ canvas {
   </a>
 
   <br><br>
-  <button onclick="unlockGame()">I HAVE PAID</button>
+
+  <button onclick="requestUnlock()">I HAVE PAID</button>
+
+  <div id="waitText"></div>
 </div>
 
 <canvas id="c" width="360" height="640"></canvas>
@@ -84,6 +92,7 @@ let paid = localStorage.getItem("paid") === "yes";
 /* ===== GAME STATE ===== */
 let started = false;
 let gameLocked = false;
+let waiting = false;
 
 const bird = { x:80, y:300, r:12, v:0 };
 const gravity = 0.5;
@@ -95,7 +104,7 @@ let pipes = [];
 
 updateCounter();
 
-/* ===== FUNCTIONS ===== */
+/* ===== UI ===== */
 function updateCounter() {
   const left = Math.max(0, MAX_PLAYS - playsUsed);
   document.getElementById("counter").innerText = "Plays left: " + left;
@@ -106,8 +115,9 @@ function showPayment() {
   document.getElementById("payBox").style.display = "block";
 }
 
+/* ===== GAME OVER ===== */
 function gameOver() {
-  if (!started || gameLocked) return; // HARD LOCK
+  if (!started || gameLocked) return;
 
   started = false;
   pipes = [];
@@ -126,6 +136,7 @@ function gameOver() {
   document.getElementById("tap").style.display = "block";
 }
 
+/* ===== PIPES ===== */
 function addPipe() {
   pipes.push({
     x: c.width,
@@ -133,6 +144,7 @@ function addPipe() {
   });
 }
 
+/* ===== UPDATE ===== */
 function update() {
   if (!started || gameLocked) return;
 
@@ -161,6 +173,7 @@ function update() {
   pipes = pipes.filter(p => p.x > -pipeW);
 }
 
+/* ===== DRAW ===== */
 function draw() {
   ctx.clearRect(0,0,c.width,c.height);
 
@@ -176,6 +189,7 @@ function draw() {
   }
 }
 
+/* ===== LOOP ===== */
 function loop() {
   update();
   draw();
@@ -183,6 +197,7 @@ function loop() {
 }
 loop();
 
+/* ===== CONTROLS ===== */
 function start() {
   if (gameLocked) {
     showPayment();
@@ -195,20 +210,33 @@ function start() {
   bird.v = jump;
 }
 
+function requestUnlock() {
+  if (waiting) return;
+  waiting = true;
+
+  document.getElementById("waitText").innerText =
+    "Waiting for payment confirmation (60 seconds)...";
+
+  setTimeout(() => {
+    unlockGame();
+  }, 60000); // 60 seconds
+}
+
 function unlockGame() {
   paid = true;
   gameLocked = false;
+  waiting = false;
   playsUsed = 0;
 
   localStorage.setItem("paid", "yes");
   localStorage.setItem("playsUsed", "0");
 
   document.getElementById("payBox").style.display = "none";
+  document.getElementById("waitText").innerText = "";
   updateCounter();
   document.getElementById("tap").style.display = "block";
 }
 
-/* ===== CONTROLS ===== */
 document.addEventListener("keydown", e => e.code === "Space" && start());
 c.addEventListener("mousedown", start);
 c.addEventListener("touchstart", start);
