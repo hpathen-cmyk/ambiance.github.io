@@ -2,34 +2,74 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Flappy Test</title>
+<title>Sooraj Flappy Game</title>
+
 <style>
-  body {
-    margin: 0;
-    background: #70c5ce;
-    overflow: hidden;
-  }
-  canvas {
-    display: block;
-    margin: auto;
-    background: #70c5ce;
-  }
-  #tap {
-    position: absolute;
-    top: 50%;
-    width: 100%;
-    text-align: center;
-    font-size: 30px;
-    font-weight: bold;
-    color: white;
-    text-shadow: 2px 2px black;
-  }
+body {
+  margin: 0;
+  background: #70c5ce;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+}
+
+canvas {
+  display: block;
+  margin: auto;
+  background: #70c5ce;
+}
+
+#tap {
+  position: absolute;
+  top: 50%;
+  width: 100%;
+  text-align: center;
+  font-size: 30px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 2px 2px black;
+}
+
+#payBox {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.9);
+  color: white;
+  text-align: center;
+  padding-top: 150px;
+  z-index: 999;
+}
+
+#payBox button {
+  padding: 14px 26px;
+  font-size: 18px;
+  margin: 10px;
+  border-radius: 8px;
+  border: none;
+}
 </style>
 </head>
 
 <body>
 
 <div id="tap">TAP TO START</div>
+
+<div id="payBox">
+  <h2>Free Plays Finished</h2>
+  <p>Pay ₹10 via GPay to continue</p>
+
+  <!-- GPay UPI link -->
+  <a href="upi://pay?pa=9567857306@upi&pn=Sooraj&am=10&cu=INR"
+     target="_blank">
+    <button>PAY WITH GPAY</button>
+  </a>
+
+  <br><br>
+
+  <button onclick="unlockGame()">I HAVE PAID</button>
+</div>
+
 <canvas id="c" width="360" height="640"></canvas>
 
 <script>
@@ -37,6 +77,13 @@ const c = document.getElementById("c");
 const ctx = c.getContext("2d");
 
 let started = false;
+
+// payment tracking
+let plays = localStorage.getItem("plays")
+  ? parseInt(localStorage.getItem("plays"))
+  : 0;
+
+let paid = localStorage.getItem("paid") === "yes";
 
 const bird = {
   x: 80,
@@ -58,11 +105,24 @@ function addPipe() {
 }
 
 function reset() {
+  plays++;
+  localStorage.setItem("plays", plays);
+
+  if (plays >= 2 && !paid) {
+    document.getElementById("payBox").style.display = "block";
+    return;
+  }
+
   bird.y = 300;
   bird.v = 0;
   pipes = [];
   started = false;
   document.getElementById("tap").style.display = "block";
+
+  const msg = new SpeechSynthesisUtterance("കളി അവസാനിച്ചു");
+  msg.lang = "ml-IN";
+  speechSynthesis.cancel();
+  speechSynthesis.speak(msg);
 }
 
 function update() {
@@ -124,6 +184,15 @@ function start() {
     document.getElementById("tap").style.display = "none";
   }
   bird.v = jump;
+}
+
+function unlockGame() {
+  localStorage.setItem("paid", "yes");
+  paid = true;
+  plays = 0;
+  localStorage.setItem("plays", plays);
+  document.getElementById("payBox").style.display = "none";
+  reset();
 }
 
 document.addEventListener("keydown", e => {
