@@ -1,139 +1,119 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sooraj Game</title>
 
 <style>
 body{
   margin:0;
+  font-family:Arial, sans-serif;
   background:#70c5ce;
-  font-family:Arial;
-  overflow:hidden;
 }
 canvas{display:block;margin:auto;}
 #tap{
   position:absolute;
-  top:45%;
+  top:40%;
   width:100%;
   text-align:center;
   font-size:26px;
   color:white;
   text-shadow:2px 2px black;
 }
-#plays{
-  position:absolute;
-  top:10px;
-  left:10px;
-  background:white;
-  padding:6px 12px;
-  border-radius:6px;
-  font-weight:bold;
-}
-#pay{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:black;
-  color:white;
+#adTop,#adBottom{
+  background:#fff;
+  color:#000;
   text-align:center;
-  padding-top:120px;
+  border-radius:6px;
+  margin:10px auto;
 }
-#pay button{
-  padding:14px 24px;
-  font-size:18px;
-  border-radius:8px;
-  border:none;
-  margin:10px;
+#adTop{width:320px;height:50px;line-height:50px;}
+#adBottom{width:320px;height:100px;line-height:100px;}
+
+footer{
+  background:#fff;
+  padding:20px;
+  margin-top:30px;
+  font-size:14px;
 }
+footer h2{margin-top:20px;}
+footer a{color:#0066cc;text-decoration:none;margin-right:10px;}
+section{margin-top:30px;}
 </style>
 </head>
 
 <body>
 
+<div id="adTop">🔸 Top Banner Ad</div>
+
 <div id="tap">TAP TO START</div>
-<div id="plays">Plays left: 2</div>
-
-<div id="pay">
-  <h2>Free plays finished</h2>
-  <p>Pay ₹10 via GPay</p>
-
-  <a href="upi://pay?pa=9567857306@upi&pn=Sooraj&am=10&cu=INR">
-    <button>PAY WITH GPAY</button>
-  </a>
-
-  <br><br>
-  <button onclick="paidClick()">I HAVE PAID</button>
-
-  <p id="wait"></p>
-</div>
-
 <canvas id="c" width="360" height="640"></canvas>
+
+<div id="adBottom">🔸 Bottom Ad</div>
+
+<footer>
+  <div>
+    <a href="#about">About</a>
+    <a href="#privacy">Privacy Policy</a>
+    <a href="#contact">Contact</a>
+  </div>
+
+  <section id="about">
+    <h2>About</h2>
+    <p>Sooraj Game is a simple browser-based game created for fun and learning.</p>
+    <p>This project is built using HTML, CSS, and JavaScript.</p>
+  </section>
+
+  <section id="privacy">
+    <h2>Privacy Policy</h2>
+    <p>We respect your privacy and do not collect personal data directly.</p>
+    <p>Third-party services such as Google AdSense may use cookies to display ads.</p>
+    <p>Users can manage ad preferences via Google Ads Settings.</p>
+  </section>
+
+  <section id="contact">
+    <h2>Contact</h2>
+    <p>Email: <strong>tkhamsa985@gmail.com</strong></p>
+  </section>
+</footer>
 
 <script>
 const c=document.getElementById("c");
 const ctx=c.getContext("2d");
 
-let bird={x:80,y:300,v:0};
-let pipes=[];
 let started=false;
-let locked=false;
-
+const bird={x:80,y:300,v:0};
 const gravity=0.5;
 const jump=-8;
 const gap=150;
 const pipeW=50;
+let pipes=[];
 
-let playsUsed=parseInt(localStorage.getItem("plays")||"0");
-let paid=localStorage.getItem("paid")==="yes";
-
-updateUI();
-
-/* -------- UI -------- */
-function updateUI(){
-  let left=Math.max(0,2-playsUsed);
-  document.getElementById("plays").innerText="Plays left: "+left;
-}
-
-/* -------- GAME OVER -------- */
 function gameOver(){
   started=false;
   bird.y=300;
   bird.v=0;
   pipes=[];
-
-  playsUsed++;
-  localStorage.setItem("plays",playsUsed);
-  updateUI();
-
-  if(playsUsed>=2 && !paid){
-    locked=true;
-    document.getElementById("pay").style.display="block";
-    return;
-  }
-
   document.getElementById("tap").style.display="block";
 }
 
-/* -------- PIPES -------- */
 function addPipe(){
   pipes.push({x:c.width,top:Math.random()*250+40});
 }
 
-/* -------- UPDATE -------- */
 function update(){
-  if(!started || locked) return;
+  if(!started) return;
 
   bird.v+=gravity;
   bird.y+=bird.v;
 
-  if(bird.y<0 || bird.y>c.height) gameOver();
+  if(bird.y<0||bird.y>c.height) gameOver();
 
-  if(pipes.length===0 || pipes[pipes.length-1].x<200) addPipe();
+  if(pipes.length===0||pipes[pipes.length-1].x<200) addPipe();
 
   for(let p of pipes){
     p.x-=2.5;
-
     if(
       bird.x+12>p.x &&
       bird.x-12<p.x+pipeW &&
@@ -142,14 +122,11 @@ function update(){
       gameOver();
     }
   }
-
   pipes=pipes.filter(p=>p.x>-pipeW);
 }
 
-/* -------- DRAW -------- */
 function draw(){
   ctx.clearRect(0,0,c.width,c.height);
-
   ctx.fillStyle="yellow";
   ctx.beginPath();
   ctx.arc(bird.x,bird.y,12,0,Math.PI*2);
@@ -162,7 +139,6 @@ function draw(){
   }
 }
 
-/* -------- LOOP -------- */
 function loop(){
   update();
   draw();
@@ -170,34 +146,12 @@ function loop(){
 }
 loop();
 
-/* -------- CONTROLS -------- */
 function start(){
-  if(locked){
-    document.getElementById("pay").style.display="block";
-    return;
-  }
   if(!started){
     started=true;
     document.getElementById("tap").style.display="none";
   }
   bird.v=jump;
-}
-
-function paidClick(){
-  document.getElementById("wait").innerText="Please wait 60 seconds...";
-  setTimeout(unlock,60000);
-}
-
-function unlock(){
-  paid=true;
-  locked=false;
-  playsUsed=0;
-  localStorage.setItem("paid","yes");
-  localStorage.setItem("plays","0");
-  document.getElementById("pay").style.display="none";
-  document.getElementById("wait").innerText="";
-  updateUI();
-  document.getElementById("tap").style.display="block";
 }
 
 document.addEventListener("keydown",e=>e.code==="Space"&&start());
