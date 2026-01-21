@@ -1,141 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sooraj Dino Game</title>
 
-<title>Ambiance Dino Game</title>
-
-<!-- ✅ Google AdSense verification -->
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1824710596042778"
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1824710596042778"
      crossorigin="anonymous"></script>
 
-<style>
-body{
-  margin:0;
-  font-family:Arial,Helvetica,sans-serif;
-  background: linear-gradient(270deg,#ff9800,#f44336,#4caf50,#ffeb3b);
-  background-size:600% 600%;
-  animation:bg 15s ease infinite;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-}
-@keyframes bg{
-  0%{background-position:0% 50%}
-  50%{background-position:100% 50%}
-  100%{background-position:0% 50%}
-}
-#game{
-  width:300px;
-  height:200px;
-  border:2px solid #000;
-  background:#fff;
-  position:relative;
-  overflow:hidden;
-}
-#dino{
-  width:40px;
-  height:40px;
-  background:#000;
-  position:absolute;
-  bottom:0;
-  left:20px;
-}
-.jump{
-  animation:jump 0.5s linear;
-}
-@keyframes jump{
-  0%{bottom:0}
-  50%{bottom:80px}
-  100%{bottom:0}
-}
-#cactus{
-  width:20px;
-  height:40px;
-  background:red;
-  position:absolute;
-  bottom:0;
-  right:-20px;
-  animation:move 1.5s linear infinite;
-}
-@keyframes move{
-  0%{right:-20px}
-  100%{right:320px}
-}
-#overlay{
-  display:none;
-  position:fixed;
-  top:0;left:0;
-  width:100%;height:100%;
-  background:rgba(0,0,0,0.8);
-  color:#fff;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-  z-index:10;
-}
-button{
-  padding:10px 20px;
-  font-size:16px;
-  margin-top:10px;
-  cursor:pointer;
-}
-</style>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(270deg, #ff9a9e, #fad0c4, #a1c4fd, #c2e9fb);
+            background-size: 800% 800%;
+            animation: gradient 15s ease infinite;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        canvas {
+            border: 2px solid #333;
+            background: #fff;
+        }
+    </style>
 </head>
-
 <body>
+    <canvas id="gameCanvas" width="600" height="150"></canvas>
 
-<div id="game">
-  <div id="dino"></div>
-  <div id="cactus"></div>
-</div>
+    <script>
+        // Dino Game JS
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
 
-<div id="overlay">
-  <h2>Play limit reached</h2>
-  <p>Please support us to continue</p>
-  <p><b>GPay:</b> 9567857306</p>
-  <button onclick="unlock()">I have paid</button>
-</div>
+        let dino = { x: 50, y: 120, width: 20, height: 20, dy: 0, jump: -6 };
+        let gravity = 0.3;
+        let obstacles = [];
+        let gameOver = false;
+        let score = 0;
 
-<script>
-let dino=document.getElementById("dino");
-let cactus=document.getElementById("cactus");
-let overlay=document.getElementById("overlay");
+        document.addEventListener('keydown', (e) => {
+            if(e.code === 'Space' && dino.y === 120) {
+                dino.dy = dino.jump;
+            }
+        });
 
-let plays = localStorage.getItem("plays") || 0;
+        function spawnObstacle() {
+            const height = 20;
+            const width = 20;
+            obstacles.push({ x: canvas.width, y: 130, width, height });
+        }
 
-document.addEventListener("keydown",()=>{
-  if(!dino.classList.contains("jump")){
-    dino.classList.add("jump");
-    setTimeout(()=>dino.classList.remove("jump"),500);
-  }
-});
+        function update() {
+            if(gameOver) return;
+            ctx.clearRect(0,0,canvas.width,canvas.height);
 
-let check = setInterval(()=>{
-  let dTop=parseInt(window.getComputedStyle(dino).getPropertyValue("top"));
-  let cLeft=parseInt(window.getComputedStyle(cactus).getPropertyValue("left"));
+            // Dino physics
+            dino.dy += gravity;
+            dino.y += dino.dy;
+            if(dino.y > 120) { dino.y = 120; dino.dy = 0; }
 
-  if(cLeft<60 && cLeft>20 && dTop>120){
-    plays++;
-    localStorage.setItem("plays",plays);
-    alert("Game Over");
+            ctx.fillStyle = 'green';
+            ctx.fillRect(dino.x, dino.y, dino.width, dino.height);
 
-    if(plays>=2){
-      overlay.style.display="flex";
-      cactus.style.animation="none";
-    }
-  }
-},10);
+            // Obstacles
+            for(let i=0;i<obstacles.length;i++){
+                obstacles[i].x -= 4;
+                ctx.fillStyle = 'red';
+                ctx.fillRect(obstacles[i].x, obstacles[i].y, obstacles[i].width, obstacles[i].height);
 
-function unlock(){
-  localStorage.setItem("plays",0);
-  overlay.style.display="none";
-  cactus.style.animation="move 1.5s linear infinite";
-}
-</script>
+                // Collision
+                if(dino.x < obstacles[i].x + obstacles[i].width &&
+                   dino.x + dino.width > obstacles[i].x &&
+                   dino.y < obstacles[i].y + obstacles[i].height &&
+                   dino.height + dino.y > obstacles[i].y) {
+                    gameOver = true;
+                }
 
+                if(obstacles[i].x + obstacles[i].width < 0) {
+                    obstacles.splice(i,1);
+                    score++;
+                    i--;
+                }
+            }
+
+            ctx.fillStyle = 'black';
+            ctx.font = '16px Arial';
+            ctx.fillText('Score: '+score, 500, 20);
+
+            requestAnimationFrame(update);
+        }
+
+        setInterval(spawnObstacle, 2000);
+        update();
+    </script>
 </body>
 </html>
