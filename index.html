@@ -2,58 +2,49 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sooraj Flappy Game</title>
+<title>Sooraj Game</title>
 
 <style>
-body {
-  margin: 0;
-  background: #70c5ce;
-  overflow: hidden;
-  font-family: Arial, sans-serif;
+body{
+  margin:0;
+  background:#70c5ce;
+  font-family:Arial;
+  overflow:hidden;
 }
-canvas {
-  display: block;
-  margin: auto;
+canvas{display:block;margin:auto;}
+#tap{
+  position:absolute;
+  top:45%;
+  width:100%;
+  text-align:center;
+  font-size:26px;
+  color:white;
+  text-shadow:2px 2px black;
 }
-#tap {
-  position: absolute;
-  top: 45%;
-  width: 100%;
-  text-align: center;
-  font-size: 28px;
-  color: white;
-  text-shadow: 2px 2px black;
+#plays{
+  position:absolute;
+  top:10px;
+  left:10px;
+  background:white;
+  padding:6px 12px;
+  border-radius:6px;
+  font-weight:bold;
 }
-#counter {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background: white;
-  padding: 6px 12px;
-  font-weight: bold;
-  border-radius: 6px;
+#pay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:black;
+  color:white;
+  text-align:center;
+  padding-top:120px;
 }
-#payBox {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.9);
-  color: white;
-  text-align: center;
-  padding-top: 150px;
-  z-index: 999;
-}
-#payBox button {
-  padding: 14px 26px;
-  font-size: 18px;
-  margin: 10px;
-  border-radius: 8px;
-  border: none;
-}
-#waitText {
-  margin-top: 20px;
-  font-size: 16px;
-  color: #ffcc00;
+#pay button{
+  padding:14px 24px;
+  font-size:18px;
+  border-radius:8px;
+  border:none;
+  margin:10px;
 }
 </style>
 </head>
@@ -61,185 +52,157 @@ canvas {
 <body>
 
 <div id="tap">TAP TO START</div>
-<div id="counter">Plays left: 2</div>
+<div id="plays">Plays left: 2</div>
 
-<div id="payBox">
-  <h2>No Free Plays Left</h2>
-  <p>Pay ₹10 via GPay to continue</p>
+<div id="pay">
+  <h2>Free plays finished</h2>
+  <p>Pay ₹10 via GPay</p>
 
   <a href="upi://pay?pa=9567857306@upi&pn=Sooraj&am=10&cu=INR">
     <button>PAY WITH GPAY</button>
   </a>
 
   <br><br>
+  <button onclick="paidClick()">I HAVE PAID</button>
 
-  <button onclick="requestUnlock()">I HAVE PAID</button>
-
-  <div id="waitText"></div>
+  <p id="wait"></p>
 </div>
 
 <canvas id="c" width="360" height="640"></canvas>
 
 <script>
-const c = document.getElementById("c");
-const ctx = c.getContext("2d");
+const c=document.getElementById("c");
+const ctx=c.getContext("2d");
 
-/* ===== PLAY LIMIT ===== */
-const MAX_PLAYS = 2;
-let playsUsed = Number(localStorage.getItem("playsUsed") || 0);
-let paid = localStorage.getItem("paid") === "yes";
+let bird={x:80,y:300,v:0};
+let pipes=[];
+let started=false;
+let locked=false;
 
-/* ===== GAME STATE ===== */
-let started = false;
-let gameLocked = false;
-let waiting = false;
+const gravity=0.5;
+const jump=-8;
+const gap=150;
+const pipeW=50;
 
-const bird = { x:80, y:300, r:12, v:0 };
-const gravity = 0.5;
-const jump = -8;
+let playsUsed=parseInt(localStorage.getItem("plays")||"0");
+let paid=localStorage.getItem("paid")==="yes";
 
-const pipeW = 50;
-const gap = 150;
-let pipes = [];
+updateUI();
 
-updateCounter();
-
-/* ===== UI ===== */
-function updateCounter() {
-  const left = Math.max(0, MAX_PLAYS - playsUsed);
-  document.getElementById("counter").innerText = "Plays left: " + left;
+/* -------- UI -------- */
+function updateUI(){
+  let left=Math.max(0,2-playsUsed);
+  document.getElementById("plays").innerText="Plays left: "+left;
 }
 
-function showPayment() {
-  gameLocked = true;
-  document.getElementById("payBox").style.display = "block";
-}
-
-/* ===== GAME OVER ===== */
-function gameOver() {
-  if (!started || gameLocked) return;
-
-  started = false;
-  pipes = [];
-  bird.y = 300;
-  bird.v = 0;
+/* -------- GAME OVER -------- */
+function gameOver(){
+  started=false;
+  bird.y=300;
+  bird.v=0;
+  pipes=[];
 
   playsUsed++;
-  localStorage.setItem("playsUsed", playsUsed);
-  updateCounter();
+  localStorage.setItem("plays",playsUsed);
+  updateUI();
 
-  if (playsUsed >= MAX_PLAYS && !paid) {
-    showPayment();
+  if(playsUsed>=2 && !paid){
+    locked=true;
+    document.getElementById("pay").style.display="block";
     return;
   }
 
-  document.getElementById("tap").style.display = "block";
+  document.getElementById("tap").style.display="block";
 }
 
-/* ===== PIPES ===== */
-function addPipe() {
-  pipes.push({
-    x: c.width,
-    top: Math.random() * 250 + 40
-  });
+/* -------- PIPES -------- */
+function addPipe(){
+  pipes.push({x:c.width,top:Math.random()*250+40});
 }
 
-/* ===== UPDATE ===== */
-function update() {
-  if (!started || gameLocked) return;
+/* -------- UPDATE -------- */
+function update(){
+  if(!started || locked) return;
 
-  bird.v += gravity;
-  bird.y += bird.v;
+  bird.v+=gravity;
+  bird.y+=bird.v;
 
-  if (bird.y < 0 || bird.y > c.height) gameOver();
+  if(bird.y<0 || bird.y>c.height) gameOver();
 
-  if (pipes.length === 0 || pipes[pipes.length - 1].x < 200) {
-    addPipe();
-  }
+  if(pipes.length===0 || pipes[pipes.length-1].x<200) addPipe();
 
-  for (let p of pipes) {
-    p.x -= 2.5;
+  for(let p of pipes){
+    p.x-=2.5;
 
-    if (
-      bird.x + bird.r > p.x &&
-      bird.x - bird.r < p.x + pipeW &&
-      (bird.y - bird.r < p.top ||
-       bird.y + bird.r > p.top + gap)
-    ) {
+    if(
+      bird.x+12>p.x &&
+      bird.x-12<p.x+pipeW &&
+      (bird.y-12<p.top || bird.y+12>p.top+gap)
+    ){
       gameOver();
     }
   }
 
-  pipes = pipes.filter(p => p.x > -pipeW);
+  pipes=pipes.filter(p=>p.x>-pipeW);
 }
 
-/* ===== DRAW ===== */
-function draw() {
+/* -------- DRAW -------- */
+function draw(){
   ctx.clearRect(0,0,c.width,c.height);
 
-  ctx.fillStyle = "yellow";
+  ctx.fillStyle="yellow";
   ctx.beginPath();
-  ctx.arc(bird.x, bird.y, bird.r, 0, Math.PI*2);
+  ctx.arc(bird.x,bird.y,12,0,Math.PI*2);
   ctx.fill();
 
-  ctx.fillStyle = "green";
-  for (let p of pipes) {
-    ctx.fillRect(p.x, 0, pipeW, p.top);
-    ctx.fillRect(p.x, p.top + gap, pipeW, c.height);
+  ctx.fillStyle="green";
+  for(let p of pipes){
+    ctx.fillRect(p.x,0,pipeW,p.top);
+    ctx.fillRect(p.x,p.top+gap,pipeW,c.height);
   }
 }
 
-/* ===== LOOP ===== */
-function loop() {
+/* -------- LOOP -------- */
+function loop(){
   update();
   draw();
   requestAnimationFrame(loop);
 }
 loop();
 
-/* ===== CONTROLS ===== */
-function start() {
-  if (gameLocked) {
-    showPayment();
+/* -------- CONTROLS -------- */
+function start(){
+  if(locked){
+    document.getElementById("pay").style.display="block";
     return;
   }
-  if (!started) {
-    started = true;
-    document.getElementById("tap").style.display = "none";
+  if(!started){
+    started=true;
+    document.getElementById("tap").style.display="none";
   }
-  bird.v = jump;
+  bird.v=jump;
 }
 
-function requestUnlock() {
-  if (waiting) return;
-  waiting = true;
-
-  document.getElementById("waitText").innerText =
-    "Waiting for payment confirmation (60 seconds)...";
-
-  setTimeout(() => {
-    unlockGame();
-  }, 60000); // 60 seconds
+function paidClick(){
+  document.getElementById("wait").innerText="Please wait 60 seconds...";
+  setTimeout(unlock,60000);
 }
 
-function unlockGame() {
-  paid = true;
-  gameLocked = false;
-  waiting = false;
-  playsUsed = 0;
-
-  localStorage.setItem("paid", "yes");
-  localStorage.setItem("playsUsed", "0");
-
-  document.getElementById("payBox").style.display = "none";
-  document.getElementById("waitText").innerText = "";
-  updateCounter();
-  document.getElementById("tap").style.display = "block";
+function unlock(){
+  paid=true;
+  locked=false;
+  playsUsed=0;
+  localStorage.setItem("paid","yes");
+  localStorage.setItem("plays","0");
+  document.getElementById("pay").style.display="none";
+  document.getElementById("wait").innerText="";
+  updateUI();
+  document.getElementById("tap").style.display="block";
 }
 
-document.addEventListener("keydown", e => e.code === "Space" && start());
-c.addEventListener("mousedown", start);
-c.addEventListener("touchstart", start);
+document.addEventListener("keydown",e=>e.code==="Space"&&start());
+c.addEventListener("mousedown",start);
+c.addEventListener("touchstart",start);
 </script>
 
 </body>
