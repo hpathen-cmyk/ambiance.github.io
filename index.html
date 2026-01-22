@@ -1,163 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sooraj Flappy Bird</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sooraj Flappy Bird</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(180deg, #8ED6FF, #004CB3);
+    }
 
-<!-- Google AdSense -->
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1824710596042778"
-crossorigin="anonymous"></script>
+    canvas {
+      background: #70c5ce;
+      display: block;
+      margin: 0 auto;
+    }
 
-<style>
-  body {
-    margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
-    background: linear-gradient(to bottom, #70c5ce, #f7f7f7);
-    text-align: center;
-  }
-  nav {
-    display: flex;
-    justify-content: center;
-    background: #333;
-  }
-  nav button {
-    background: none;
-    border: none;
-    color: white;
-    padding: 14px 20px;
-    font-size: 16px;
-    cursor: pointer;
-  }
-  nav button:hover {
-    background: #555;
-  }
-  section {
-    display: none;
-    padding: 20px;
-  }
-  section.active { display: block; }
-  canvas {
-    display: block;
-    margin: 20px auto;
-    background: #70c5ce url('https://i.imgur.com/8vZ4o6J.png') repeat-x bottom; /* ground */
-  }
-  #score {
-    font-size: 24px;
-    font-weight: bold;
-    color: #000;
-  }
-</style>
+    h1, p {
+      text-align: center;
+      color: #000;
+    }
+  </style>
 </head>
 <body>
+  <div>
+    <h1>Play Sooraj Flappy Bird!</h1>
+    <p>Fly the bird as far as possible! Use <b>Spacebar</b> or tap the screen.</p>
+    <canvas id="gameCanvas" width="400" height="600"></canvas>
+    <p>Score: <span id="score">0</span></p>
+  </div>
 
-<nav>
-  <button onclick="showSection('game')">Game</button>
-  <button onclick="showSection('privacy')">Privacy Policy</button>
-  <button onclick="showSection('contact')">Contact</button>
-</nav>
-
-<section id="game" class="active">
-  <h1>Play Sooraj Flappy Bird!</h1>
-  <p>Fly the bird as far as possible! Use <strong>Spacebar</strong> or tap the screen.</p>
-  <canvas id="gameCanvas" width="400" height="600"></canvas>
-  <div id="score">0</div>
-  
-  <!-- AdSense placeholder -->
-  <ins class="adsbygoogle"
-       style="display:block"
-       data-ad-client="ca-pub-1824710596042778"
-       data-ad-slot="1234567890"
-       data-ad-format="auto"
-       data-full-width-responsive="true"></ins>
   <script>
-       (adsbygoogle = window.adsbygoogle || []).push({});
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // Bird image
+    const birdImg = new Image();
+    birdImg.src = "bird.png"; // Make sure this file is in the same folder
+
+    // Game variables
+    let bird = { x: 50, y: 250, width: 40, height: 40, gravity: 0.6, lift: -10, velocity: 0 };
+    let pipes = [];
+    let frame = 0;
+    let score = 0;
+
+    function createPipe() {
+      const gap = 120;
+      const topHeight = Math.floor(Math.random() * (canvas.height - gap - 100)) + 50;
+      const bottomHeight = canvas.height - topHeight - gap;
+      pipes.push({ x: canvas.width, top: topHeight, bottom: bottomHeight, width: 50 });
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw bird
+      ctx.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
+
+      // Draw pipes
+      ctx.fillStyle = "green";
+      pipes.forEach(pipe => {
+        ctx.fillRect(pipe.x, 0, pipe.width, pipe.top);
+        ctx.fillRect(pipe.x, canvas.height - pipe.bottom, pipe.width, pipe.bottom);
+      });
+    }
+
+    function update() {
+      frame++;
+
+      bird.velocity += bird.gravity;
+      bird.y += bird.velocity;
+
+      if (frame % 90 === 0) createPipe();
+
+      pipes.forEach(pipe => {
+        pipe.x -= 2;
+
+        // Check collision
+        if (
+          bird.x + bird.width > pipe.x &&
+          bird.x < pipe.x + pipe.width &&
+          (bird.y < pipe.top || bird.y + bird.height > canvas.height - pipe.bottom)
+        ) {
+          resetGame();
+        }
+
+        // Increase score
+        if (pipe.x + pipe.width === bird.x) {
+          score++;
+          document.getElementById("score").textContent = score;
+        }
+      });
+
+      // Remove off-screen pipes
+      pipes = pipes.filter(pipe => pipe.x + pipe.width > 0);
+
+      // Check floor/ceiling
+      if (bird.y + bird.height > canvas.height || bird.y < 0) resetGame();
+    }
+
+    function resetGame() {
+      bird.y = 250;
+      bird.velocity = 0;
+      pipes = [];
+      score = 0;
+      document.getElementById("score").textContent = score;
+      frame = 0;
+    }
+
+    function gameLoop() {
+      update();
+      draw();
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Controls
+    document.addEventListener("keydown", e => { if (e.code === "Space") bird.velocity = bird.lift; });
+    canvas.addEventListener("click", () => { bird.velocity = bird.lift; });
+
+    birdImg.onload = () => {
+      gameLoop();
+    }
   </script>
-</section>
-
-<section id="privacy">
-  <h1>Privacy Policy</h1>
-  <p>This website collects no personal info. Ads may collect anonymous data as per Google AdSense.</p>
-</section>
-
-<section id="contact">
-  <h1>Contact Us</h1>
-  <p>Email: <strong>tkhamsa985@gmail.com</strong></p>
-</section>
-
-<script>
-function showSection(id) {
-  document.querySelectorAll('section').forEach(sec => sec.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-// Game Code
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
-
-let birdImg = new Image();
-birdImg.src = "https://i.imgur.com/sX6Y9gG.png"; // small bird sprite ~30x30
-
-let bird = { x:50, y:300, w:30, h:30, gravity:0.6, velocity:0, jump:-10 };
-let pipes = [];
-let pipeWidth = 50, pipeGap = 150;
-let score = 0;
-let gameOver = false;
-
-// Create pipe
-function createPipe(){
-  let topHeight = Math.random() * (canvas.height - pipeGap - 100) + 50;
-  pipes.push({ x:canvas.width, top:topHeight, bottom:topHeight + pipeGap });
-}
-
-// Draw everything
-function draw() {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-
-  // Bird
-  ctx.drawImage(birdImg, bird.x, bird.y, bird.w, bird.h);
-
-  // Pipes
-  ctx.fillStyle = "green";
-  for(let i=0;i<pipes.length;i++){
-    let p = pipes[i];
-    ctx.fillRect(p.x, 0, pipeWidth, p.top);
-    ctx.fillRect(p.x, p.bottom, pipeWidth, canvas.height - p.bottom);
-
-    // Collision
-    if(bird.x < p.x + pipeWidth &&
-       bird.x + bird.w > p.x &&
-       (bird.y < p.top || bird.y + bird.h > p.bottom)) gameOver = true;
-
-    // Score
-    if(p.x + pipeWidth === bird.x) score++;
-    p.x -= 2; // Move pipe
-  }
-
-  if(pipes.length && pipes[0].x < -pipeWidth) pipes.shift();
-
-  // Bird physics
-  bird.velocity += bird.gravity;
-  bird.y += bird.velocity;
-
-  if(bird.y + bird.h > canvas.height || bird.y < 0) gameOver = true;
-
-  document.getElementById("score").innerText = score;
-
-  if(!gameOver) requestAnimationFrame(draw);
-  else setTimeout(()=>alert("Game Over! Score: "+score), 10);
-}
-
-// Controls
-window.addEventListener("keydown", e => { if(e.code==="Space") bird.velocity = bird.jump; });
-window.addEventListener("click", () => { bird.velocity = bird.jump; });
-
-// Start game after everything loads
-window.onload = function(){
-  setInterval(createPipe, 1500);
-  draw();
-}
-</script>
-
 </body>
-       </html>
+</html>
