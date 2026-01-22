@@ -3,19 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sooraj Flappy Bird Site</title>
+<title>Sooraj Flappy Bird</title>
 
 <!-- Google AdSense -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1824710596042778"
-     crossorigin="anonymous"></script>
+crossorigin="anonymous"></script>
 
 <style>
   body {
     margin: 0;
     font-family: Arial, Helvetica, sans-serif;
     background: linear-gradient(to bottom, #70c5ce, #f7f7f7);
+    text-align: center;
   }
-
   nav {
     display: flex;
     justify-content: center;
@@ -32,27 +32,20 @@
   nav button:hover {
     background: #555;
   }
-
   section {
     display: none;
     padding: 20px;
-    text-align: center;
   }
-  section.active {
-    display: block;
-  }
-
+  section.active { display: block; }
   canvas {
-    background: #70c5ce;
     display: block;
     margin: 20px auto;
+    background: #70c5ce url('https://i.imgur.com/8vZ4o6J.png') repeat-x bottom; /* ground */
   }
-
   #score {
     font-size: 24px;
-    color: #000;
     font-weight: bold;
-    margin-top: 10px;
+    color: #000;
   }
 </style>
 </head>
@@ -64,18 +57,15 @@
   <button onclick="showSection('contact')">Contact</button>
 </nav>
 
-<!-- Game Section -->
 <section id="game" class="active">
   <h1>Play Sooraj Flappy Bird!</h1>
-  <p>Welcome to Sooraj Flappy Bird! Your goal is to fly the bird as far as possible without hitting pipes.</p>
-  <p>Use the <strong>Spacebar</strong> or tap the screen to make the bird jump. Try to beat your high score!</p>
-
+  <p>Fly the bird as far as possible! Use <strong>Spacebar</strong> or tap the screen.</p>
   <canvas id="gameCanvas" width="400" height="600"></canvas>
   <div id="score">0</div>
-
-  <!-- Example AdSense ad below canvas -->
+  
+  <!-- AdSense placeholder -->
   <ins class="adsbygoogle"
-       style="display:block; text-align:center;"
+       style="display:block"
        data-ad-client="ca-pub-1824710596042778"
        data-ad-slot="1234567890"
        data-ad-format="auto"
@@ -85,83 +75,89 @@
   </script>
 </section>
 
-<!-- Privacy Section -->
 <section id="privacy">
   <h1>Privacy Policy</h1>
-  <p>This website collects no personal information from users. Ads displayed on this site may collect anonymous data in accordance with Google AdSense policies.</p>
-  <p>We respect your privacy and do not share any data with third parties.</p>
+  <p>This website collects no personal info. Ads may collect anonymous data as per Google AdSense.</p>
 </section>
 
-<!-- Contact Section -->
 <section id="contact">
   <h1>Contact Us</h1>
-  <p>You can contact us at: <strong>tkhamsa985@gmail.com</strong></p>
+  <p>Email: <strong>tkhamsa985@gmail.com</strong></p>
 </section>
 
 <script>
-  function showSection(id) {
-    document.querySelectorAll('section').forEach(sec => sec.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
+function showSection(id) {
+  document.querySelectorAll('section').forEach(sec => sec.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// Game Code
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+let birdImg = new Image();
+birdImg.src = "https://i.imgur.com/sX6Y9gG.png"; // small bird sprite ~30x30
+
+let bird = { x:50, y:300, w:30, h:30, gravity:0.6, velocity:0, jump:-10 };
+let pipes = [];
+let pipeWidth = 50, pipeGap = 150;
+let score = 0;
+let gameOver = false;
+
+// Create pipe
+function createPipe(){
+  let topHeight = Math.random() * (canvas.height - pipeGap - 100) + 50;
+  pipes.push({ x:canvas.width, top:topHeight, bottom:topHeight + pipeGap });
+}
+
+// Draw everything
+function draw() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // Bird
+  ctx.drawImage(birdImg, bird.x, bird.y, bird.w, bird.h);
+
+  // Pipes
+  ctx.fillStyle = "green";
+  for(let i=0;i<pipes.length;i++){
+    let p = pipes[i];
+    ctx.fillRect(p.x, 0, pipeWidth, p.top);
+    ctx.fillRect(p.x, p.bottom, pipeWidth, canvas.height - p.bottom);
+
+    // Collision
+    if(bird.x < p.x + pipeWidth &&
+       bird.x + bird.w > p.x &&
+       (bird.y < p.top || bird.y + bird.h > p.bottom)) gameOver = true;
+
+    // Score
+    if(p.x + pipeWidth === bird.x) score++;
+    p.x -= 2; // Move pipe
   }
 
-  // Flappy Bird Game Code
-  const canvas = document.getElementById("gameCanvas");
-  const ctx = canvas.getContext("2d");
+  if(pipes.length && pipes[0].x < -pipeWidth) pipes.shift();
 
-  let bird = { x: 50, y: 300, w: 30, h: 30, gravity: 0.6, velocity: 0, jump: -10 };
-  let pipes = [];
-  let pipeWidth = 50;
-  let pipeGap = 150;
-  let score = 0;
-  let gameOver = false;
+  // Bird physics
+  bird.velocity += bird.gravity;
+  bird.y += bird.velocity;
 
-  function createPipe() {
-    let topHeight = Math.random() * (canvas.height - pipeGap - 100) + 50;
-    pipes.push({ x: canvas.width, top: topHeight, bottom: topHeight + pipeGap });
-  }
+  if(bird.y + bird.h > canvas.height || bird.y < 0) gameOver = true;
 
-  function draw() {
-    ctx.clearRect(0,0,canvas.width,canvas.height);
+  document.getElementById("score").innerText = score;
 
-    // Bird
-    ctx.fillStyle = "yellow";
-    ctx.fillRect(bird.x, bird.y, bird.w, bird.h);
+  if(!gameOver) requestAnimationFrame(draw);
+  else setTimeout(()=>alert("Game Over! Score: "+score), 10);
+}
 
-    // Pipes
-    ctx.fillStyle = "green";
-    for(let i=0;i<pipes.length;i++){
-      let p = pipes[i];
-      ctx.fillRect(p.x, 0, pipeWidth, p.top);
-      ctx.fillRect(p.x, p.bottom, pipeWidth, canvas.height - p.bottom);
+// Controls
+window.addEventListener("keydown", e => { if(e.code==="Space") bird.velocity = bird.jump; });
+window.addEventListener("click", () => { bird.velocity = bird.jump; });
 
-      if(bird.x < p.x + pipeWidth &&
-         bird.x + bird.w > p.x &&
-         (bird.y < p.top || bird.y + bird.h > p.bottom)) gameOver = true;
-
-      if(p.x + pipeWidth === bird.x) score++;
-    }
-
-    if(pipes.length && pipes[0].x < -pipeWidth) pipes.shift();
-
-    // Bird physics
-    bird.velocity += bird.gravity;
-    bird.y += bird.velocity;
-
-    if(bird.y + bird.h > canvas.height || bird.y < 0) gameOver = true;
-
-    document.getElementById("score").innerText = score;
-
-    if(!gameOver) requestAnimationFrame(draw);
-    else alert("Game Over! Score: " + score);
-  }
-
+// Start game after everything loads
+window.onload = function(){
   setInterval(createPipe, 1500);
-
-  window.addEventListener("keydown", e => { if(e.code==="Space") bird.velocity = bird.jump; });
-  window.addEventListener("click", () => { bird.velocity = bird.jump; });
-
   draw();
+}
 </script>
 
 </body>
-</html>
+       </html>
