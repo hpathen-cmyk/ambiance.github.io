@@ -1,93 +1,112 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Premium Access</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Premium Access</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial;
-      background: #000;
-      color: white;
-      text-align: center;
-    }
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0d1117;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
 
-    /* Background animation */
-    .bg {
-      position: fixed;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(45deg, #000, #0f2027, #000);
-      animation: move 6s infinite linear;
-      z-index: -1;
-    }
+/* Card */
+.card {
+  background: #161b22;
+  padding: 25px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 340px;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+}
 
-    @keyframes move {
-      0% {filter: hue-rotate(0deg);}
-      100% {filter: hue-rotate(360deg);}
-    }
+/* Title */
+h1 {
+  font-size: 22px;
+  margin-bottom: 10px;
+}
 
-    .box {
-      margin-top: 100px;
-      background: #111;
-      padding: 25px;
-      border-radius: 15px;
-      width: 90%;
-      max-width: 320px;
-      margin-left: auto;
-      margin-right: auto;
-    }
+/* Price */
+.price {
+  font-size: 26px;
+  color: #2ecc71;
+  font-weight: bold;
+  margin: 10px 0;
+}
 
-    h2 {
-      margin-bottom: 10px;
-    }
+/* Features */
+.features {
+  text-align: left;
+  font-size: 14px;
+  color: #c9d1d9;
+  margin: 15px 0;
+}
 
-    .price {
-      color: #00ffcc;
-      font-size: 24px;
-      margin: 10px 0;
-    }
+.features li {
+  margin-bottom: 6px;
+}
 
-    button {
-      background: #00ffcc;
-      border: none;
-      padding: 15px;
-      width: 100%;
-      border-radius: 10px;
-      font-size: 18px;
-      margin-top: 15px;
-      cursor: pointer;
-    }
+/* Button */
+.btn {
+  background: #2ecc71;
+  border: none;
+  padding: 14px;
+  width: 100%;
+  border-radius: 10px;
+  font-size: 16px;
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+}
 
-    .upi {
-      margin-top: 15px;
-      font-size: 13px;
-      color: #aaa;
-    }
-  </style>
+.btn:hover {
+  background: #28c267;
+}
+
+/* Footer */
+.footer {
+  margin-top: 12px;
+  font-size: 12px;
+  color: #8b949e;
+}
+</style>
 </head>
 
 <body>
 
-<div class="bg"></div>
+<div class="card">
+  <h1>🔥 Premium Access</h1>
 
-<div class="box">
-  <h2>🔥 Premium Access</h2>
-  <div class="price">₹29 Only</div>
+  <div class="price">₹29</div>
 
-  <button onclick="payNow()">Unlock Now</button>
+  <ul class="features">
+    <li>✔ Instant access after payment</li>
+    <li>✔ Private premium content</li>
+    <li>✔ High quality</li>
+    <li>✔ Secure payment</li>
+  </ul>
 
-  <div class="upi">
-    UPI: tkhamsa985-1@okaxis
+  <button class="btn" onclick="payNow()">Unlock Now</button>
+
+  <div class="footer">
+    UPI: tkhamsa985-1@okaxis<br>
+    🔒 Secure Payment
   </div>
 </div>
 
 <script>
 function payNow() {
   window.location.href =
-  "upi://pay?pa=tkhamsa985-1@okaxis&pn=Sooraj%20Krishna&am=29&cu=INR";
+  "upi://pay?pa=tkhamsa985-1@okaxis&pn=Sooraj%20Krishna&am=29&cu=INR&tn=Premium";
 }
 </script>
 
