@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Premium Access</title>
+<title>Premium Content</title>
 
 <style>
 body {
@@ -19,7 +19,6 @@ body {
   justify-content: space-between;
   padding: 15px 25px;
   background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(10px);
 }
 
 /* Container */
@@ -32,39 +31,11 @@ body {
 
 /* Card */
 .card {
-  background: linear-gradient(145deg, #2c2f36, #1b1e24);
+  background: #1b1e24;
   padding: 25px;
-  border-radius: 18px;
+  border-radius: 16px;
   width: 320px;
   text-align: center;
-  box-shadow: 0 15px 50px rgba(0,0,0,0.7);
-  border: 1px solid rgba(255,255,255,0.1);
-  animation: fadeIn 1s ease;
-}
-
-/* Animation */
-@keyframes fadeIn {
-  from {opacity: 0; transform: translateY(20px);}
-  to {opacity: 1; transform: translateY(0);}
-}
-
-/* Price */
-.price {
-  font-size: 28px;
-  color: #2ecc71;
-  margin: 10px 0;
-}
-
-/* Features */
-.features {
-  text-align: left;
-  margin: 15px 0;
-  font-size: 14px;
-  color: #ccc;
-}
-
-.features li {
-  margin-bottom: 8px;
 }
 
 /* Button */
@@ -73,30 +44,11 @@ body {
   color: #000;
   padding: 14px;
   border: none;
-  border-radius: 12px;
+  border-radius: 10px;
   width: 100%;
   font-size: 16px;
   cursor: pointer;
-  font-weight: bold;
-  transition: 0.2s;
-}
-
-.btn:hover {
-  transform: scale(1.05);
-}
-
-/* UPI */
-.upi {
   margin-top: 15px;
-  font-size: 13px;
-  color: #bbb;
-}
-
-.upi span {
-  display: block;
-  font-weight: bold;
-  margin-top: 5px;
-  cursor: pointer;
 }
 
 /* Footer */
@@ -112,45 +64,39 @@ body {
 <body>
 
 <div class="navbar">
-  <b>PREMIUM</b>
-  <span>Secure</span>
+  <b>CONTENT HUB</b>
+  <span>Info</span>
 </div>
 
 <div class="container">
   <div class="card">
 
-    <h2>Premium Access</h2>
-    <div class="price">₹29 Only</div>
+    <h2>Premium Content Access</h2>
 
-    <ul class="features">
-      <li>✔ Access after manual verification</li>
-      <li>✔ Private premium content</li>
-      <li>✔ High quality</li>
-      <li>✔ Secure process</li>
-    </ul>
+    <p style="font-size:14px;color:#ccc;">
+      Get access to exclusive premium content.  
+      High-quality and regularly updated.
+    </p>
 
     <!-- Safe Button -->
-    <button class="btn" onclick="showPayment()">Pay ₹29</button>
+    <button class="btn" onclick="showInfo()">Get Access</button>
 
-    <!-- UPI -->
-    <div class="upi">
-      Pay using UPI:
-      <span onclick="copyUPI()">tkhamsa985-1@okaxis</span>
-    </div>
-
-    <div class="upi">🔒 Secure Payment</div>
-
-    <p style="font-size:12px;color:#aaa;margin-top:10px;">
-      After payment, contact support to receive access.
+    <p style="font-size:12px;color:#aaa;margin-top:15px;">
+      Access is provided after confirmation.
     </p>
 
   </div>
 </div>
 
 <div class="footer">
-  Contact: support@email.com
+  © 2026 Content Hub | contact@email.com
 </div>
 
 <script>
-function showPayment() {
-  alert("Send ₹29 to UPI ID shown below and contact support for 
+function showInfo() {
+  alert("Contact support to get access details.");
+}
+</script>
+
+</body>
+</html>
