@@ -1,63 +1,122 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Premium Access</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
-    body {
-      font-family: Arial;
-      text-align: center;
-      background: #0f0f0f;
-      color: white;
-      margin-top: 80px;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
     }
 
-    .box {
-      background: #1c1c1c;
-      padding: 25px;
-      border-radius: 15px;
+    body {
+      background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: #1e1e1e;
+      padding: 30px 25px;
+      border-radius: 20px;
       width: 90%;
-      max-width: 350px;
-      margin: auto;
+      max-width: 360px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      animation: fadeIn 0.6s ease;
+    }
+
+    h2 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .price {
+      font-size: 22px;
+      color: #00e676;
+      margin: 10px 0 20px;
+      font-weight: bold;
+    }
+
+    .features {
+      text-align: left;
+      font-size: 14px;
+      margin-bottom: 20px;
+      color: #ccc;
+    }
+
+    .features li {
+      margin-bottom: 8px;
     }
 
     button {
-      background: #00c853;
+      background: linear-gradient(135deg, #00c853, #00e676);
       color: white;
       border: none;
       padding: 15px;
       width: 100%;
-      font-size: 18px;
-      border-radius: 10px;
-      margin-top: 15px;
+      font-size: 17px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 15px rgba(0,200,83,0.4);
     }
 
     .upi {
       margin-top: 15px;
-      font-size: 14px;
-      color: #ccc;
+      font-size: 13px;
+      color: #aaa;
+    }
+
+    .badge {
+      margin-top: 15px;
+      font-size: 12px;
+      color: #00e676;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
     }
   </style>
 </head>
 
 <body>
 
-  <div class="box">
-    <h2>🔥 Premium Content</h2>
-    <p>Unlock now for ₹29</p>
+  <div class="container">
+    <h2>🔥 Premium Access</h2>
+    <p class="price">₹29 Only</p>
 
-    <button onclick="payNow()">Pay Now</button>
+    <ul class="features">
+      <li>✔ Instant access after payment</li>
+      <li>✔ High quality exclusive content</li>
+      <li>✔ Private & secure</li>
+    </ul>
+
+    <button onclick="payNow()">🚀 Unlock Now</button>
 
     <div class="upi">
       Or pay manually:<br>
       <b>tkhamsa985-1@okaxis</b>
     </div>
+
+    <div class="badge">🔒 100% Secure Payment</div>
   </div>
 
   <script>
     function payNow() {
-      window.location.href = "upi://pay?pa=tkhamsa985-1@okaxis&pn=Sooraj%20Krishna&am=29&cu=INR&tn=Premium%20Clip%2029";
+      window.location.href = "upi://pay?pa=tkhamsa985-1@okaxis&pn=Sooraj%20Krishna&am=29&cu=INR&tn=Premium%20Access";
     }
   </script>
 
