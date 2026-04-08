@@ -11,38 +11,15 @@ body {
   font-family: 'Segoe UI', sans-serif;
   background: linear-gradient(120deg, #0a0f1c, #0d1b2a);
   color: #fff;
-  overflow: hidden;
-}
-
-/* Background glow animation */
-body::before {
-  content: "";
-  position: absolute;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.05), transparent 60%);
-  animation: moveBg 10s linear infinite;
-}
-
-@keyframes moveBg {
-  0% { transform: translate(0,0); }
-  50% { transform: translate(-20%, -20%); }
-  100% { transform: translate(0,0); }
 }
 
 /* Navbar */
 .navbar {
   display: flex;
   justify-content: space-between;
-  padding: 15px 30px;
+  padding: 15px 25px;
   background: rgba(255,255,255,0.05);
   backdrop-filter: blur(10px);
-  animation: fadeDown 1s ease;
-}
-
-@keyframes fadeDown {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Container */
@@ -62,55 +39,13 @@ body::before {
   text-align: center;
   box-shadow: 0 15px 50px rgba(0,0,0,0.7);
   border: 1px solid rgba(255,255,255,0.1);
-  animation: fadeUp 1s ease;
-  position: relative;
 }
 
-/* Shine effect */
-.card::after {
-  content: "";
-  position: absolute;
-  top: -100%;
-  left: -50%;
-  width: 200%;
-  height: 300%;
-  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.1), transparent);
-  transform: rotate(25deg);
-  animation: shine 5s infinite;
-}
-
-@keyframes shine {
-  0% { top: -100%; }
-  100% { top: 200%; }
-}
-
-/* Fade up */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Floating card */
-.card:hover {
-  transform: translateY(-5px) scale(1.01);
-}
-
-/* Title */
-h1 {
-  margin-bottom: 5px;
-}
-
-/* Price glow */
+/* Price */
 .price {
-  font-size: 30px;
-  margin: 10px 0;
+  font-size: 28px;
   color: #2ecc71;
-  animation: glow 2s infinite alternate;
-}
-
-@keyframes glow {
-  from { text-shadow: 0 0 5px #2ecc71; }
-  to { text-shadow: 0 0 20px #2ecc71; }
+  margin: 10px 0;
 }
 
 /* Features */
@@ -123,48 +58,35 @@ h1 {
 
 .features li {
   margin-bottom: 8px;
-  transition: 0.3s;
-}
-
-.features li:hover {
-  transform: translateX(5px);
-  color: #fff;
 }
 
 /* Button */
 .btn {
-  background: linear-gradient(145deg, #000, #222);
-  color: #fff;
+  background: #2ecc71;
+  color: #000;
   padding: 14px;
   border: none;
   border-radius: 12px;
   width: 100%;
   font-size: 16px;
   cursor: pointer;
-  margin-top: 10px;
-  position: relative;
-  overflow: hidden;
+  font-weight: bold;
 }
 
-/* Button pulse */
-.btn::before {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: rgba(255,255,255,0.1);
-  top: 0;
-  left: -100%;
-  transition: 0.5s;
-}
-
-.btn:hover::before {
-  left: 100%;
-}
-
-/* Click animation */
 .btn:active {
-  transform: scale(0.95);
+  transform: scale(0.96);
+}
+
+/* Secondary button */
+.btn2 {
+  margin-top: 10px;
+  background: transparent;
+  border: 1px solid #aaa;
+  color: #fff;
+  padding: 10px;
+  border-radius: 10px;
+  width: 100%;
+  cursor: pointer;
 }
 
 /* UPI */
@@ -181,28 +103,17 @@ h1 {
   cursor: pointer;
 }
 
-/* Copy animation */
-.upi span:active {
-  color: #2ecc71;
-}
-
 /* Footer */
-.trust {
+.footer {
   text-align: center;
-  padding: 20px;
-  font-size: 14px;
-  color: #ccc;
-  animation: fadeUp 1.5s ease;
+  font-size: 12px;
+  color: #888;
+  padding: 15px;
 }
-
-.badges img {
-  height: 40px;
-  margin: 5px;
-  transition: 0.3s;
-}
-
-.badges img:hover {
-  transform: scale(1.2);
+.footer a {
+  color: #aaa;
+  text-decoration: none;
+  margin: 0 5px;
 }
 </style>
 </head>
@@ -210,48 +121,68 @@ h1 {
 <body>
 
 <div class="navbar">
-  <h2>PREMIUM</h2>
-  <button>Login</button>
+  <b>PREMIUM</b>
+  <span>Secure</span>
 </div>
 
 <div class="container">
   <div class="card">
 
-    <h1>Premium Access</h1>
+    <h2>Premium Access</h2>
     <div class="price">₹29 Only</div>
 
     <ul class="features">
-      <li>⏱ Instant access after payment</li>
-      <li>💎 High quality exclusive content</li>
-      <li>🔒 Private & secure</li>
+      <li>✔ Instant access after confirmation</li>
+      <li>✔ Private premium content</li>
+      <li>✔ High quality</li>
+      <li>✔ Secure payment</li>
     </ul>
 
-    <button class="btn" onclick="payNow()">🚀 Unlock Now</button>
+    <!-- Pay Button -->
+    <button class="btn" onclick="payNow()">Pay ₹29</button>
 
+    <!-- Confirm Button -->
+    <button class="btn2" onclick="openWhatsApp()">I Paid</button>
+
+    <!-- Manual UPI -->
     <div class="upi">
       Or pay manually:
       <span onclick="copyUPI()">tkhamsa985-1@okaxis</span>
     </div>
 
-    <div class="upi">🔒 100% Secure Payment</div>
+    <div class="upi">🔒 Secure Payment</div>
+
+    <p style="font-size:12px;color:#aaa;margin-top:10px;">
+      Digital product. Access will be provided after payment verification.
+    </p>
 
   </div>
 </div>
 
-<div class="trust">
-  Trust Banner
-  <div class="badges">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/UPI-Logo-vector.svg">
-  </div>
+<div class="footer">
+  Contact: support@email.com <br><br>
+  <a href="privacy.html">Privacy</a> |
+  <a href="terms.html">Terms</a> |
+  <a href="about.html">About</a>
 </div>
 
 <script>
 function payNow() {
-  document.querySelector(".btn").innerText = "Processing...";
   window.location.href =
   "upi://pay?pa=tkhamsa985-1@okaxis&pn=Sooraj%20Krishna&am=29&cu=INR";
 }
 
-function copyUPI
+function openWhatsApp() {
+  window.open(
+    "https://wa.me/91XXXXXXXXXX?text=I%20have%20paid%20₹29%20please%20verify%20and%20send%20access"
+  );
+}
+
+function copyUPI() {
+  navigator.clipboard.writeText("tkhamsa985-1@okaxis");
+  alert("UPI ID copied");
+}
+</script>
+
+</body>
+</html>
