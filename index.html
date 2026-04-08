@@ -1,112 +1,95 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Premium Access</title>
+  <meta charset="UTF-8">
+  <title>Premium Access</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      background: #000;
+      color: white;
+      text-align: center;
+    }
+
+    /* Background animation */
+    .bg {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, #000, #0f2027, #000);
+      animation: move 6s infinite linear;
+      z-index: -1;
+    }
+
+    @keyframes move {
+      0% {filter: hue-rotate(0deg);}
+      100% {filter: hue-rotate(360deg);}
+    }
+
+    .box {
+      margin-top: 100px;
+      background: #111;
+      padding: 25px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 320px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    h2 {
+      margin-bottom: 10px;
+    }
+
+    .price {
+      color: #00ffcc;
+      font-size: 24px;
+      margin: 10px 0;
+    }
+
+    button {
+      background: #00ffcc;
+      border: none;
+      padding: 15px;
+      width: 100%;
+      border-radius: 10px;
+      font-size: 18px;
+      margin-top: 15px;
+      cursor: pointer;
+    }
+
+    .upi {
+      margin-top: 15px;
+      font-size: 13px;
+      color: #aaa;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="bg"></div>
+
+<div class="box">
+  <h2>🔥 Premium Access</h2>
+  <div class="price">₹29 Only</div>
+
+  <button onclick="payNow()">Unlock Now</button>
+
+  <div class="upi">
+    UPI: tkhamsa985-1@okaxis
+  </div>
+</div>
+
+<script>
+function payNow() {
+  window.location.href =
+  "upi://pay?pa=tkhamsa985-1@okaxis&pn=Sooraj%20Krishna&am=29&cu=INR";
 }
+</script>
 
-body {
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: linear-gradient(270deg, #000, #0a0a0a, #111);
-  background-size: 600% 600%;
-  animation: bgMove 10s ease infinite;
-  overflow: hidden;
-  color: white;
-}
-
-/* 🔥 Animated background */
-@keyframes bgMove {
-  0% {background-position: 0%;}
-  50% {background-position: 100%;}
-  100% {background-position: 0%;}
-}
-
-/* ✨ Floating glow bubbles */
-.bubble {
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(0,255,200,0.15);
-  animation: float 10s infinite ease-in-out;
-}
-
-@keyframes float {
-  0% {transform: translateY(0);}
-  50% {transform: translateY(-80px);}
-  100% {transform: translateY(0);}
-}
-
-/* 💎 Card */
-.container {
-  position: relative;
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(15px);
-  border-radius: 20px;
-  padding: 30px;
-  width: 90%;
-  max-width: 350px;
-  text-align: center;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.7);
-  animation: fadeIn 0.6s ease;
-}
-
-@keyframes fadeIn {
-  from {opacity:0; transform: translateY(20px);}
-  to {opacity:1; transform: translateY(0);}
-}
-
-h2 {
-  font-size: 26px;
-  margin-bottom: 10px;
-}
-
-/* 💰 Price */
-.price {
-  font-size: 28px;
-  color: #00ffc3;
-  font-weight: bold;
-  margin: 10px 0;
-}
-
-/* ⏳ urgency */
-.timer {
-  font-size: 13px;
-  color: #ff5252;
-  margin-bottom: 15px;
-}
-
-/* ✔ features */
-.features {
-  text-align: left;
-  font-size: 14px;
-  color: #ccc;
-  margin-bottom: 20px;
-}
-
-.features li {
-  margin-bottom: 8px;
-}
-
-/* 🚀 Button */
-button {
-  background: linear-gradient(135deg, #00ffc3, #00bcd4);
-  border: none;
-  padding: 15px;
-  width: 100%;
-  border-radius: 12px;
-  font-size: 18px;
-  color: black;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s;
-  box-shadow: 0 0 15px rgba(0,255,
+</body>
+</html>
