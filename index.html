@@ -1,19 +1,65 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Pay ₹29</title>
+  <title>Premium Access</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      background: #0f0f0f;
+      color: white;
+      margin-top: 80px;
+    }
+
+    .box {
+      background: #1c1c1c;
+      padding: 25px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 350px;
+      margin: auto;
+    }
+
+    button {
+      background: #00c853;
+      color: white;
+      border: none;
+      padding: 15px;
+      width: 100%;
+      font-size: 18px;
+      border-radius: 10px;
+      margin-top: 15px;
+    }
+
+    .upi {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #ccc;
+    }
+  </style>
 </head>
 
-<body style="text-align:center; font-family:sans-serif; margin-top:60px;">
+<body>
 
-  <img src="logo.png" width="100" style="border-radius:20px;">
+  <div class="box">
+    <h2>🔥 Premium Content</h2>
+    <p>Unlock now for ₹29</p>
 
-  <h2>🔥 Premium Content ₹29</h2>
+    <button onclick="payNow()">Pay Now</button>
 
-  <a href="upi://pay?pa=tkhamsa985-1@okaxis&pn=Sooraj%20Krishna&am=29&cu=INR&tn=Premium%20Clip%2029">
-    <button style="padding:15px 30px; font-size:18px;">Pay Now</button>
-  </a>
+    <div class="upi">
+      Or pay manually:<br>
+      <b>tkhamsa985-1@okaxis</b>
+    </div>
+  </div>
+
+  <script>
+    function payNow() {
+      window.location.href = "upi://pay?pa=tkhamsa985-1@okaxis&pn=Sooraj%20Krishna&am=29&cu=INR&tn=Premium%20Clip%2029";
+    }
+  </script>
 
 </body>
 </html>
