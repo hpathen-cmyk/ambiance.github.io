@@ -11,6 +11,23 @@ body {
   font-family: 'Segoe UI', sans-serif;
   background: linear-gradient(120deg, #0a0f1c, #0d1b2a);
   color: #fff;
+  overflow: hidden;
+}
+
+/* Background glow animation */
+body::before {
+  content: "";
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.05), transparent 60%);
+  animation: moveBg 10s linear infinite;
+}
+
+@keyframes moveBg {
+  0% { transform: translate(0,0); }
+  50% { transform: translate(-20%, -20%); }
+  100% { transform: translate(0,0); }
 }
 
 /* Navbar */
@@ -20,22 +37,15 @@ body {
   padding: 15px 30px;
   background: rgba(255,255,255,0.05);
   backdrop-filter: blur(10px);
+  animation: fadeDown 1s ease;
 }
 
-.navbar h2 {
-  margin: 0;
-  letter-spacing: 2px;
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.navbar button {
-  background: transparent;
-  border: 1px solid #aaa;
-  color: #fff;
-  padding: 6px 12px;
-  border-radius: 6px;
-}
-
-/* Center layout */
+/* Container */
 .container {
   display: flex;
   justify-content: center;
@@ -47,21 +57,60 @@ body {
 .card {
   background: linear-gradient(145deg, #2c2f36, #1b1e24);
   padding: 25px;
-  border-radius: 16px;
+  border-radius: 18px;
   width: 320px;
   text-align: center;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+  box-shadow: 0 15px 50px rgba(0,0,0,0.7);
   border: 1px solid rgba(255,255,255,0.1);
+  animation: fadeUp 1s ease;
+  position: relative;
+}
+
+/* Shine effect */
+.card::after {
+  content: "";
+  position: absolute;
+  top: -100%;
+  left: -50%;
+  width: 200%;
+  height: 300%;
+  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.1), transparent);
+  transform: rotate(25deg);
+  animation: shine 5s infinite;
+}
+
+@keyframes shine {
+  0% { top: -100%; }
+  100% { top: 200%; }
+}
+
+/* Fade up */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Floating card */
+.card:hover {
+  transform: translateY(-5px) scale(1.01);
 }
 
 /* Title */
-.card h1 {
+h1 {
   margin-bottom: 5px;
 }
 
+/* Price glow */
 .price {
-  font-size: 28px;
+  font-size: 30px;
   margin: 10px 0;
+  color: #2ecc71;
+  animation: glow 2s infinite alternate;
+}
+
+@keyframes glow {
+  from { text-shadow: 0 0 5px #2ecc71; }
+  to { text-shadow: 0 0 20px #2ecc71; }
 }
 
 /* Features */
@@ -74,6 +123,12 @@ body {
 
 .features li {
   margin-bottom: 8px;
+  transition: 0.3s;
+}
+
+.features li:hover {
+  transform: translateX(5px);
+  color: #fff;
 }
 
 /* Button */
@@ -87,14 +142,32 @@ body {
   font-size: 16px;
   cursor: pointer;
   margin-top: 10px;
-  box-shadow: 0 0 15px rgba(255,255,255,0.1);
+  position: relative;
+  overflow: hidden;
 }
 
-.btn:hover {
-  transform: scale(1.03);
+/* Button pulse */
+.btn::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(255,255,255,0.1);
+  top: 0;
+  left: -100%;
+  transition: 0.5s;
 }
 
-/* Manual payment */
+.btn:hover::before {
+  left: 100%;
+}
+
+/* Click animation */
+.btn:active {
+  transform: scale(0.95);
+}
+
+/* UPI */
 .upi {
   margin-top: 15px;
   font-size: 13px;
@@ -105,36 +178,42 @@ body {
   display: block;
   font-weight: bold;
   margin-top: 5px;
+  cursor: pointer;
 }
 
-/* Footer trust */
+/* Copy animation */
+.upi span:active {
+  color: #2ecc71;
+}
+
+/* Footer */
 .trust {
   text-align: center;
   padding: 20px;
   font-size: 14px;
   color: #ccc;
-}
-
-.badges {
-  margin-top: 10px;
+  animation: fadeUp 1.5s ease;
 }
 
 .badges img {
   height: 40px;
   margin: 5px;
+  transition: 0.3s;
+}
+
+.badges img:hover {
+  transform: scale(1.2);
 }
 </style>
 </head>
 
 <body>
 
-<!-- Navbar -->
 <div class="navbar">
   <h2>PREMIUM</h2>
   <button>Login</button>
 </div>
 
-<!-- Main -->
 <div class="container">
   <div class="card">
 
@@ -151,7 +230,7 @@ body {
 
     <div class="upi">
       Or pay manually:
-      <span id="upi">tkhamsa985-1@okaxis</span>
+      <span onclick="copyUPI()">tkhamsa985-1@okaxis</span>
     </div>
 
     <div class="upi">🔒 100% Secure Payment</div>
@@ -159,9 +238,8 @@ body {
   </div>
 </div>
 
-<!-- Trust -->
 <div class="trust">
-  <div>Trust Banner</div>
+  Trust Banner
   <div class="badges">
     <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg">
     <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg">
@@ -171,11 +249,9 @@ body {
 
 <script>
 function payNow() {
+  document.querySelector(".btn").innerText = "Processing...";
   window.location.href =
   "upi://pay?pa=tkhamsa985-1@okaxis&pn=Sooraj%20Krishna&am=29&cu=INR";
 }
-</script>
 
-</body>
-</html>
-  
+function copyUPI
