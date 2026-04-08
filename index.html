@@ -8,9 +8,9 @@
 <style>
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
+  font-family: Arial;
   background: #0d1117;
-  color: #fff;
+  color: white;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -20,38 +20,25 @@ body {
 /* Card */
 .card {
   background: #161b22;
-  padding: 25px;
+  padding: 20px;
   border-radius: 16px;
   width: 90%;
   max-width: 340px;
   text-align: center;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.6);
 }
 
-/* Title */
-h1 {
-  font-size: 22px;
-  margin-bottom: 10px;
+/* Preview */
+.preview {
+  width: 100%;
+  border-radius: 10px;
+  filter: blur(8px);
 }
 
 /* Price */
 .price {
-  font-size: 26px;
+  font-size: 24px;
   color: #2ecc71;
-  font-weight: bold;
   margin: 10px 0;
-}
-
-/* Features */
-.features {
-  text-align: left;
-  font-size: 14px;
-  color: #c9d1d9;
-  margin: 15px 0;
-}
-
-.features li {
-  margin-bottom: 6px;
 }
 
 /* Button */
@@ -62,21 +49,20 @@ h1 {
   width: 100%;
   border-radius: 10px;
   font-size: 16px;
-  color: #000;
-  font-weight: bold;
   cursor: pointer;
   margin-top: 10px;
 }
 
-.btn:hover {
-  background: #28c267;
+/* Unlock button hidden */
+.unlock {
+  display: none;
+  background: #00c853;
 }
 
-/* Footer */
 .footer {
-  margin-top: 12px;
+  margin-top: 10px;
   font-size: 12px;
-  color: #8b949e;
+  color: #aaa;
 }
 </style>
 </head>
@@ -84,29 +70,39 @@ h1 {
 <body>
 
 <div class="card">
-  <h1>🔥 Premium Access</h1>
+
+  <h2>🔥 Premium Content</h2>
+
+  <!-- 🔥 BLUR IMAGE -->
+  <img src="https://via.placeholder.com/300x200" class="preview" id="preview">
 
   <div class="price">₹29</div>
 
-  <ul class="features">
-    <li>✔ Instant access after payment</li>
-    <li>✔ Private premium content</li>
-    <li>✔ High quality</li>
-    <li>✔ Secure payment</li>
-  </ul>
+  <button class="btn" onclick="payNow()">Pay & Unlock</button>
 
-  <button class="btn" onclick="payNow()">Unlock Now</button>
+  <!-- 🔓 Unlock button -->
+  <button class="btn unlock" id="unlockBtn" onclick="unlockContent()">Click to View Content</button>
 
   <div class="footer">
     UPI: tkhamsa985-1@okaxis<br>
     🔒 Secure Payment
   </div>
+
 </div>
 
 <script>
 function payNow() {
   window.location.href =
-  "upi://pay?pa=tkhamsa985-1@okaxis&pn=Sooraj%20Krishna&am=29&cu=INR&tn=Premium";
+  "upi://pay?pa=tkhamsa985-1@okaxis&pn=Sooraj%20Krishna&am=29&cu=INR";
+
+  // Fake unlock after 5 sec
+  setTimeout(() => {
+    document.getElementById("unlockBtn").style.display = "block";
+  }, 5000);
+}
+
+function unlockContent() {
+  document.getElementById("preview").style.filter = "blur(0px)";
 }
 </script>
 
