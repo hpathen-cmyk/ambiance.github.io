@@ -9,69 +9,43 @@
 body {
   margin: 0;
   font-family: 'Poppins', sans-serif;
-  background: linear-gradient(135deg, #0f172a, #020617);
-  color: #fff;
+  background: linear-gradient(135deg, #020617, #0f172a);
+  color: white;
 }
 
-/* Navbar */
 .navbar {
   display: flex;
   justify-content: space-between;
   padding: 18px 25px;
   background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(10px);
 }
 
-/* Container */
 .container {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 85vh;
+  height: 90vh;
 }
 
-/* Card */
 .card {
   background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(20px);
   padding: 30px;
   border-radius: 20px;
   width: 330px;
   text-align: center;
-  box-shadow: 0 0 30px rgba(0,0,0,0.5);
 }
 
-/* Buttons */
 .btn {
+  width: 100%;
   padding: 14px;
   border-radius: 12px;
-  width: 100%;
+  border: none;
   font-size: 16px;
   cursor: pointer;
-  margin-top: 12px;
-  border: none;
-}
-
-/* Primary */
-.pay-btn {
-  background: linear-gradient(90deg, #22c55e, #4ade80);
-  color: #000;
+  margin-top: 15px;
+  background: linear-gradient(90deg,#22c55e,#4ade80);
+  color: black;
   font-weight: bold;
-}
-
-/* Backup */
-.backup-btn {
-  background: #1e293b;
-  color: #fff;
-  border: 1px solid #334155;
-}
-
-/* Footer */
-.footer {
-  text-align: center;
-  font-size: 12px;
-  color: #777;
-  padding: 15px;
 }
 </style>
 </head>
@@ -88,35 +62,23 @@ body {
 
     <h2>Premium Access 🔒</h2>
 
-    <p style="font-size:14px;color:#ccc;">
-      Unlock exclusive premium content.  
-      Instant access after payment.
+    <p style="color:#ccc;font-size:14px;">
+      Unlock exclusive premium content securely.
     </p>
 
-    <!-- MAIN PAY BUTTON -->
-    <button class="btn pay-btn" onclick="payNow()">Pay ₹99</button>
-
-    <!-- BACKUP BUTTON -->
-    <button class="btn backup-btn" onclick="showBackup()">Other Payment Options</button>
+    <!-- SAFE REDIRECT BUTTON -->
+    <button class="btn" onclick="goToPayment()">Continue</button>
 
     <p style="font-size:12px;color:#aaa;margin-top:15px;">
-      Secure UPI Payment
+      Secure payment • No data stored
     </p>
 
   </div>
 </div>
 
-<div class="footer">
-  © 2026 Content Hub
-</div>
-
 <script>
-function payNow() {
-  window.location.href = "upi://pay?pa=tkhamsa985-1@okaxis&pn=ContentHub&am=99&cu=INR";
-}
-
-function showBackup() {
-  alert("If UPI not opening:\n\n1. Open Google Pay / PhonePe\n2. Pay to UPI ID:\n\n tkhamsa985-1@okaxis");
+function goToPayment(){
+  window.location.href = "pay.html";
 }
 </script>
 
