@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Complete Payment</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: #020617;
+  color: white;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+.card {
+  background:#111827;
+  padding:30px;
+  border-radius:20px;
+  width:320px;
+  text-align:center;
+}
+
+.btn {
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:12px;
+  margin-top:15px;
+  font-size:16px;
+  cursor:pointer;
+}
+
+.pay {background:#22c55e;color:black;}
+.back {background:#1f2937;color:white;}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+  <h2>Pay ₹99</h2>
+
+  <p style="font-size:14px;color:#ccc;">
+    Complete payment using UPI apps like 
+    0 or PhonePe
+  </p>
+
+  <!-- PAY BUTTON -->
+  <button class="btn pay" onclick="payNow()">Pay Now</button>
+
+  <!-- BACKUP -->
+  <button class="btn back" onclick="backup()">Backup Method</button>
+
+  <p style="font-size:12px;color:#777;margin-top:15px;">
+    Contact support after payment
+  </p>
+
+</div>
+
+<script>
+function payNow(){
+  let ok = confirm("Open UPI app to complete payment?");
+  if(ok){
+    window.location.href = "upi://pay?pa=YOURUPI@okaxis&pn=ContentHub&am=99&cu=INR";
+  }
+}
+
+function backup(){
+  alert("Open GPay / PhonePe\nSend ₹99 to:\nYOURUPI@okaxis");
+}
+</script>
+
+</body>
+</html>
